@@ -1,0 +1,219 @@
+"""
+Application Factory
+===================
+
+This module contains the `create_app` factory function, which is responsible
+for instantiating and configuring the FastAPI application, including its
+middleware, routers, and exception handlers.
+"""
+# --- EARLY ENV LOADING ------------------------------------------------------
+# Ensure every Uvicorn reload child sees the same env vars (e.g. API keys)
+# Centralized env loader
+from modules.financehub.backend.config.env_loader import load_environment_once
+
+load_environment_once()
+from contextlib import asynccontextmanager
+import logging
+import httpx
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
+
+from modules.financehub.backend.middleware.deprecated_monitor import DeprecatedRouteMonitorMiddleware
+from modules.financehub.backend.api import api_router
+from modules.financehub.backend.config import settings
+from modules.financehub.backend.core.metrics import METRICS_EXPORTER, get_metrics_router
+from modules.financehub.backend.utils.cache_service import CacheService
+from modules.financehub.backend.utils.logger_config import get_logger
+
+# Module logger
+logger = get_logger(__name__)
+
+# --- Lifespan Management ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Handles application startup and shutdown events.
+    """
+    lifespan_logger = logging.getLogger("aevorex_finbot_api.lifespan")
+    lifespan_logger.info("Application startup sequence initiated...")
+
+    # Initialize HTTP Client
+    lifespan_logger.info("Initializing global HTTP client...")
+    try:
+        app.state.http_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(30.0),
+            limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
+            follow_redirects=True
+        )
+        lifespan_logger.info("✅ HTTP Client initialized and attached to app state.")
+    except Exception as e:
+        lifespan_logger.critical(f"FATAL: HTTP Client initialization failed: {e}", exc_info=True)
+        app.state.http_client = None
+
+    # Initialize Cache Service
+    if settings.CACHE.ENABLED:
+        lifespan_logger.info("Cache is enabled, initializing CacheService...")
+        try:
+            cache_service = await CacheService.create(
+                redis_host=settings.REDIS.HOST,
+                redis_port=settings.REDIS.PORT,
+                redis_db=settings.REDIS.DB_CACHE,
+                connect_timeout=settings.REDIS.CONNECT_TIMEOUT_SECONDS,
+                socket_op_timeout=settings.REDIS.SOCKET_TIMEOUT_SECONDS,
+                default_ttl=settings.CACHE.DEFAULT_TTL_SECONDS,
+                lock_ttl=settings.CACHE.LOCK_TTL_SECONDS,
+                lock_retry_delay=settings.CACHE.LOCK_RETRY_DELAY_SECONDS,
+            )
+            app.state.cache = cache_service
+            lifespan_logger.info("✅ CacheService initialized and attached to app state.")
+        except Exception as e:
+            lifespan_logger.critical(f"FATAL: CacheService initialization failed: {e}", exc_info=True)
+            # ⚠️ Fallback to in-memory cache to keep the app functional in dev/demo
+            try:
+                from modules.financehub.backend.utils.cache_service import CacheService as _CS
+                cache_service = await _CS.create("memory")
+                app.state.cache = cache_service
+                lifespan_logger.warning("⚠️ Redis unavailable – falling back to in-memory CacheService.")
+            except Exception as mem_err:
+                lifespan_logger.critical(f"Failed to initialise in-memory cache: {mem_err}")
+                app.state.cache = None
+    else:
+        lifespan_logger.warning("Cache is disabled in settings. Skipping initialization.")
+        app.state.cache = None
+
+    # ------------------------------------------------------------------
+    # Initialise StockOrchestrator so chat / premium endpoints get a live instance
+    # ------------------------------------------------------------------
+    if getattr(app.state, "cache", None):
+        try:
+            from modules.financehub.backend.core.services.stock.orchestrator import StockOrchestrator
+            app.state.orchestrator = StockOrchestrator(cache=app.state.cache)
+            lifespan_logger.info("✅ StockOrchestrator initialised and attached to app state.")
+        except Exception as orch_err:
+            lifespan_logger.error(f"Could not initialise StockOrchestrator: {orch_err}")
+            app.state.orchestrator = None
+    else:
+        lifespan_logger.warning("StockOrchestrator not initialised because cache is unavailable.")
+
+    yield
+
+    # Shutdown sequence
+    lifespan_logger.info("Application shutdown sequence initiated...")
+    
+    # Close HTTP Client
+    if hasattr(app.state, 'http_client') and app.state.http_client:
+        await app.state.http_client.aclose()
+        lifespan_logger.info("✅ HTTP Client connection closed.")
+    
+    # Close Cache Service
+    if hasattr(app.state, 'cache') and app.state.cache:
+        await app.state.cache.close()
+        lifespan_logger.info("✅ CacheService connection closed.")
+    
+    lifespan_logger.info("Shutdown complete.")
+
+
+def create_app(lite: bool = False) -> FastAPI:
+    """
+    Creates and configures a FastAPI application instance.
+    """
+    app = FastAPI(
+        title=settings.APP_META.TITLE,
+        description=settings.APP_META.DESCRIPTION,
+        version=settings.APP_META.VERSION,
+        lifespan=lifespan,
+    )
+
+    # --- Metrics Endpoint ---
+    # Expose Prometheus metrics at /metrics
+    # Mount Prometheus metrics exactly at /metrics (no double prefix)
+    metrics_router = get_metrics_router(METRICS_EXPORTER)
+    app.include_router(metrics_router, tags=["Metrics"])
+
+    # Root and Health Check are always available
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return RedirectResponse(url="/docs")
+
+    @app.get(f"{settings.API_PREFIX}/health", tags=["Health"])
+    async def health_check():
+        return {"status": "ok", "timestamp": "now"}
+
+    @app.get("/health", include_in_schema=False)
+    async def health_check_legacy():
+        """Lightweight health endpoint without API prefix for browser preflight checks."""
+        return {"status": "ok"}
+
+    if lite:
+        return app
+
+    # --- Full Application Setup ---
+    # --- Middleware Setup ---
+    # Session Middleware for Google OAuth
+    if settings.GOOGLE_AUTH.ENABLED:
+        app.add_middleware(
+            SessionMiddleware,
+            secret_key=settings.GOOGLE_AUTH.SECRET_KEY.get_secret_value()
+        )
+
+    # ------------------------------------------------------------------
+    # CORS Middleware – Demo-friendly configuration
+    # ------------------------------------------------------------------
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:8083",
+            "http://127.0.0.1:8083",
+        ],
+        allow_origin_regex=None,  # Explicit list improves security & Safari CORS
+        allow_credentials=True,   # Needed when frontend includes credentials
+        allow_methods=["*"],
+        allow_headers=["*"],
+        max_age=3600,
+    )
+
+    # Deprecated route monitor – counts alias usage
+    async def _get_cache(request: Request):  # noqa: D401
+        return getattr(request.app.state, "cache", None)
+
+    app.add_middleware(DeprecatedRouteMonitorMiddleware, cache_service_factory=_get_cache)
+
+    # --- API Router Registration ---
+    # The routers are imported here, inside the factory, to prevent
+    # circular dependencies when other modules import `main.app`.
+    # from modules.financehub.backend.api.routers import api_router
+
+    # Correctly include the single, aggregated API router
+    app.include_router(api_router, prefix=f"{settings.API_PREFIX}")
+
+    # AI router is included via api_router. Duplicate inclusion removed to avoid operationId clashes.
+
+    # --- SPA & Static File Handling ---
+    # Middleware to serve the Single Page Application
+    # Temporarily disabled to debug API endpoints
+    # @app.middleware("http")
+    # async def spa_fallback(request: Request, call_next):
+    #     # Skip SPA fallback for API, docs, openapi.json, and metrics endpoints
+    #     path = request.url.path
+    #     if (path.startswith(settings.API_PREFIX) or 
+    #         path.startswith("/docs") or 
+    #         path == "/openapi.json" or 
+    #         path.startswith("/metrics")):
+    #         return await call_next(request)
+    #     
+    #     # Serve SPA for all other paths
+    #     static_dir = settings.PATHS.STATIC_DIR
+    #     index_path = os.path.join(static_dir, 'index.html')
+    #     if os.path.exists(index_path):
+    #         return FileResponse(index_path)
+    #     return await call_next(request)
+
+    # Add custom exception handlers
+    @app.exception_handler(Exception)
+    async def exception_handler(request: Request, exc: Exception):
+        logger.error(f"Unhandled exception: {exc}")
+        return {"error": "An error occurred. Please try again later."}
+
+    return app 

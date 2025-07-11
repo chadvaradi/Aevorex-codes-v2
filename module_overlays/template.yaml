@@ -1,0 +1,17 @@
+# Module Overlay Template
+# ---------------------------------------------------
+# Copy this file to module_overlays/<module>.yaml and
+# override the desired fields.
+# ---------------------------------------------------
+module_overlay:
+  # Optional: add extra quality gates specific to the module.
+  # Example: lighthouse_performance_min: 92
+  extra_quality_gate: {}
+
+  # Override the baseline component_max_loc (lines/component).
+  # Set to null to inherit baseline.
+  component_max_loc: null
+
+  # Path to a custom CI script (relative to repo root) that should
+  # run as an additional job in the pipeline (e.g. rule008-audit).
+  custom_ci_script: null 

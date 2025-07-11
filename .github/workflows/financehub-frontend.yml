@@ -1,0 +1,40 @@
+name: Shared Frontend CI
+
+on:
+  push:
+    paths:
+      - 'shared/frontend/**'
+  pull_request:
+    paths:
+      - 'shared/frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shared/frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: shared/frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test 

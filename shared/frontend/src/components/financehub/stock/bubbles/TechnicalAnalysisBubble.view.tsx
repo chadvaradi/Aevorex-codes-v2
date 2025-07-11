@@ -1,0 +1,1 @@
+export { TechnicalAnalysisBubble } from '../AnalysisBubbles/TechnicalAnalysis/TechnicalAnalysisBubble.view'; 

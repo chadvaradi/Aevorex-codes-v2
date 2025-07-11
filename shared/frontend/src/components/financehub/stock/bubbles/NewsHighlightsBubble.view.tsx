@@ -1,0 +1,1 @@
+export { NewsHighlightsBubble } from '../AnalysisBubbles/NewsHighlights/NewsHighlightsBubble.view'; 

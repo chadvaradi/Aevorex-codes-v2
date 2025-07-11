@@ -1,0 +1,49 @@
+name: User Rules Compliance & Digest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  plain-language-diff:
+    name: Generate Human Diff
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get changed files
+        uses: tj-actions/changed-files@v42
+        id: changed
+      - name: Generate plain language summary
+        run: |
+          echo "CHANGED_FILES=$(echo '${{ steps.changed.outputs.all_changed_files }}' | tr '\n' ' ' )" >> $GITHUB_ENV
+      - name: Summarize diff in plain English
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const changed = process.env.CHANGED_FILES.trim().split(/\s+/);
+            const summary = `### 📝 Plain-Language Diff\nFiles changed: ${changed.length}\n\n- **Docs**: ${changed.filter(f=>f.endsWith('.md')).length}\n- **Backend**: ${changed.filter(f=>f.startsWith('modules/financehub/backend')).length}\n- **Frontend**: ${changed.filter(f=>f.startsWith('shared/frontend')).length}`;
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pr.number,
+              body: summary,
+            });
+
+  daily-digest:
+    name: Slack Daily Digest
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post digest to Slack
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "Daily Digest: *${{ github.repository }}* – ${{ github.actor }} pushed to main. <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|View Commit>"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }} 

@@ -1,0 +1,6 @@
+module_overlay:
+  component_max_loc: 160
+  extra_quality_gate:
+    lighthouse_performance_min: 92
+    lighthouse_accessibility_min: 90
+  custom_ci_script: "scripts/rule008_audit.py" 

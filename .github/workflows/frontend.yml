@@ -1,0 +1,45 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    paths:
+      - 'shared/frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Install deps (root)
+        run: pnpm install --frozen-lockfile
+      - name: Unit & component tests with coverage
+        run: pnpm --filter @aevorex/shared-frontend test:coverage
+      - name: Cypress E2E tests (headless chrome)
+        run: pnpm --filter @aevorex/shared-frontend cy:run
+      - name: Upload Cypress videos & screenshots
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-artifacts
+          path: |
+            shared/frontend/cypress/screenshots
+            shared/frontend/cypress/videos
+      - name: Merge coverage & fail if <100%
+        run: |
+          pnpm --filter @aevorex/shared-frontend coverage:merge
+          pnpm --filter @aevorex/shared-frontend coverage:check
+      - name: Storybook test runner
+        run: pnpm --filter @aevorex/shared-frontend test:storybook
+      - name: Chromatic visual regression
+        if: ${{ env.CHROMATIC_PROJECT_TOKEN != '' }}
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: shared/frontend 

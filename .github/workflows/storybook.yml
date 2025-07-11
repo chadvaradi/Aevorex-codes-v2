@@ -1,0 +1,52 @@
+name: Storybook CI
+
+on:
+  pull_request:
+    paths:
+      - 'shared/frontend/**'
+      - '.storybook/**'
+
+jobs:
+  chromatic-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install deps (npm workspaces)
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Build Storybook
+        run: npx turbo run build-storybook --filter=@aevorex/shared-frontend...
+
+      # Publish to Chromatic for visual regression (requires secret)
+      - name: Publish to Chromatic
+        if: ${{ vars.CHROMATIC_PROJECT_TOKEN != '' }}
+        uses: chromaui/action@v1
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ vars.CHROMATIC_PROJECT_TOKEN }}
+          STORYBOOK_BUILD_DIR: storybook-static
+
+      # Still upload artifact for manual review
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: storybook-static
+
+      - name: Slack notify
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            STATUS="${{ job.status }}"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"Storybook CI finished with status: '$STATUS' (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|details>)"}' $SLACK_WEBHOOK_URL
+          fi 

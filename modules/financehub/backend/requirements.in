@@ -1,0 +1,49 @@
+# Framework
+fastapi
+flask>=3.1.1
+uvicorn[standard]
+
+# Data & ML
+pandas
+pandas-ta
+numpy==1.26.4
+scikit-learn
+yfinance
+
+# Async & Jobs
+celery
+redis
+aiocache[redis]
+ta-lib-pure
+httpx
+tenacity
+
+# Pydantic & Settings
+pydantic
+pydantic-settings
+python-dotenv
+
+# LangChain & AI
+langchain
+langdetect
+
+# Security
+authlib
+
+# Tooling & Misc
+setuptools>=78
+ruff
+structlog
+Jinja2
+Pillow
+PyPDF2
+python-magic
+docx
+joblib
+prometheus-client
+pytest
+tornado>=6.5
+requests
+requests-oauthlib
+sse-starlette
+watchfiles

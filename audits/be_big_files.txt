@@ -1,0 +1,15 @@
+# Backend Big Files Audit (PHOENIX SYNC v5-R2 - P3-10)
+
+Manual code review of files in `modules/financehub/backend` was performed
+as automated line counting scripts cannot be executed.
+
+**Result:** The following files were identified as exceeding the 250 LOC limit
+and are candidates for refactoring in a later phase:
+
+1.  **File:** `modules/financehub/backend/core/services/orchestrator.py`
+    - **Line Count:** ~293
+    - **Refactoring Strategy:** Separate response building logic into a dedicated `ResponseBuilder` class. Decouple service initialization using dependency injection.
+
+2.  **File:** `modules/financehub/backend/core/fetchers/eodhd/eodhd_fetcher.py`
+    - **Line Count:** ~306
+    - **Refactoring Strategy:** Split each `fetch_*` method (e.g., `fetch_ohlcv`, `fetch_fundamentals`) into smaller, single-responsibility functions or classes within the `eodhd` fetcher module. 

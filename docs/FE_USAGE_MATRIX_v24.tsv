@@ -1,0 +1,8 @@
+Frontend File	Endpoint Called
+hooks/auth/useAuth.tsx	/api/v1/auth/status
+hooks/auth/useAuth.tsx	/api/v1/auth/login
+hooks/auth/useAuth.tsx	/api/v1/auth/logout
+hooks/macro/useMacroRates.ts	/api/v1/macro/rates/all
+hooks/stock/useSearchData.ts	/api/v1/stock/search
+hooks/stock/useChatStream.ts	/api/v1/stock/chat/{ticker}/stream
+tests/e2e/smoke.spec.ts	/api/v1/auth/login 

@@ -1,0 +1,21 @@
+name: Env Duplication Check
+
+on:
+  pull_request:
+    paths:
+      - '**/.env*'
+      - 'scripts/scan-env.ts'
+      - '.github/workflows/env-check.yml'
+
+jobs:
+  scan-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: npm install --silent
+      - name: Scan .env collisions
+        run: npm run scan-env 

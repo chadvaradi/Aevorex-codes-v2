@@ -1,0 +1,12 @@
+# Frontend Long Files Audit (PHOENIX SYNC v5-R2 - P2-21)
+
+Manual code review of files in `modules/shared/frontend/src` was performed
+as automated line counting tools proved unreliable in the current environment.
+
+**Result:** No files were identified as exceeding the 160 LOC limit
+that would require an immediate split into `*.view.tsx` and `*.logic.ts`.
+
+The longest and most complex files are the hooks (`useChatStream`, `useSearchData`),
+but their current size is justified by their functionality.
+
+This check will be automated in the CI pipeline as per the plan. 

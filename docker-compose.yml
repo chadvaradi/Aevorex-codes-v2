@@ -1,0 +1,46 @@
+services:
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: aevorex_finbot_backend
+    build:
+      context: ./modules/financehub/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    # For development, you can mount the code volume
+    # volumes:
+    #   - ./Aevorex_codes/modules/financehub/backend:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    container_name: aevorex_finbot_frontend
+    build:
+      context: ./shared/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8083:80"
+    depends_on:
+      - backend
+    # No healthcheck needed for nginx serving static files, but a simple curl could be added
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3

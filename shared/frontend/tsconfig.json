@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["./src/*"],
+      "@ui/*": ["./src/components/ui/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@pages/*": ["./src/pages/*"]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "src/vitest.d.ts",
+    "src/components/financehub/stock/AnalysisBubbles/**/*",
+    "src/hooks/stock/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "cypress"]
+} 

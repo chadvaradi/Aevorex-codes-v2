@@ -1,0 +1,7 @@
+shared/frontend/src/hooks/useSearchData.ts:31:      const response = await fetch(`/api/v1/stock/search?q=${encodeURIComponent(query)}&limit=10`);
+shared/frontend/src/hooks/useAuth.tsx:33:        const response = await fetch('/api/v1/auth/status');
+shared/frontend/src/hooks/useAuth.tsx:57:        await fetch('/api/v1/auth/logout');
+shared/frontend/src/hooks/useTickerTapeData.ts:25:        // A hibakezelést és a toast üzeneteket már az `api.ts` `get` funkciója kezeli.
+shared/frontend/src/hooks/useStockPageData.ts:101:                // A toast hibaüzenetet már az `api.ts` kezeli.
+shared/frontend/src/lib/api.ts:40:    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+shared/frontend/src/lib/apiClient.ts:13:const apiClient: AxiosInstance = axios.create({

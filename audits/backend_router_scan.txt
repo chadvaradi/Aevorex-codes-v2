@@ -1,0 +1,41 @@
+modules/financehub/backend/api/endpoints/ai/models.py:63:@router.get(
+modules/financehub/backend/api/endpoints/auth.py:107:@router.post("/logout", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:117:@router.post("/refresh-token", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:31:@router.get("/login", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:61:@router.get("/callback", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:98:@router.get("/status", tags=["Auth"])
+modules/financehub/backend/api/endpoints/crypto/crypto.py:15:@router.get(
+modules/financehub/backend/api/endpoints/crypto/crypto.py:29:@router.get(
+modules/financehub/backend/api/endpoints/macro/bubor.py:42:@router.get(
+modules/financehub/backend/api/endpoints/macro/ecb.py:102:@router.get("/yield-curve", summary="Get ECB Yield Curve")
+modules/financehub/backend/api/endpoints/macro/ecb.py:154:@router.get("/historical-yield-curve", summary="Get Historical U.S. Treasury Yield Curve")
+modules/financehub/backend/api/endpoints/macro/ecb.py:227:@router.get("/monetary-policy", summary="Get ECB Monetary Policy Info")
+modules/financehub/backend/api/endpoints/macro/ecb.py:251:@router.get("/fx", summary="Get ECB FX Rates")
+modules/financehub/backend/api/endpoints/macro/ecb.py:296:@router.get("/fx", summary="Get ECB FX rates for major currencies")
+modules/financehub/backend/api/endpoints/macro/ecb.py:341:@router.get("/yield-curve/lite", summary="Get latest ECB Yield Curve")
+modules/financehub/backend/api/endpoints/macro/ecb.py:365:@router.get("/comprehensive", summary="Get Comprehensive ECB Economic Data")
+modules/financehub/backend/api/endpoints/macro/ecb.py:417:@router.get("/monetary-aggregates", summary="Get ECB Monetary Aggregates")
+modules/financehub/backend/api/endpoints/macro/ecb.py:465:@router.get("/inflation", summary="Get ECB Inflation Indicators")
+modules/financehub/backend/api/endpoints/macro/ecb.py:50:@router.get("/rates", summary="Get ECB Policy Rates")
+modules/financehub/backend/api/endpoints/macro/forex.py:23:@router.get("/pairs", summary="List supported FX pairs")
+modules/financehub/backend/api/endpoints/macro/forex.py:29:@router.get("/{pair}", summary="Get FX rate for the given pair (e.g. EUR/USD)")
+modules/financehub/backend/api/endpoints/macro/rates.py:131:@router.get("/all", deprecated=True)
+modules/financehub/backend/api/endpoints/macro/rates.py:141:@router.get("/curve/{source}", deprecated=True)
+modules/financehub/backend/api/endpoints/macro/rates.py:68:@router.get("/rates/all")
+modules/financehub/backend/api/endpoints/stock_endpoints/chart/chart_data.py:29:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:22:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:34:@router.get("/{ticker}/stream")
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:63:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/fundamentals/fundamentals_stock.py:28:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/news/news_stock.py:28:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/router.py:17:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:107:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:123:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:40:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/search/search_stock.py:54:@router.get("/search", response_model=SearchResponse)
+modules/financehub/backend/api/endpoints/stock_endpoints/stock_header/stock_header.py:20:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/stock_header/stock_header.py:52:# @router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:178:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:45:@router.get(
+modules/financehub/backend/api/market_data.py:48:@router.get(
+modules/financehub/backend/core/metrics/prometheus_exporter.py:157:    @router.get("/metrics", summary="Prometheus metrics")

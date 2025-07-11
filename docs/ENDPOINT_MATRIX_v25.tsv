@@ -1,0 +1,42 @@
+# FinanceHub Backend API Endpoints - Master v25
+# Státusz: Dinamikus analízis sikertelen, ez a statikus analízis és a refaktorálási tervek alapján készült.
+# Method | Path | Státusz | Forrásfájl
+# --- | --- | --- | ---
+GET | /api/v1/health | ✅ Működik | modules/financehub/backend/main.py
+# --- Auth ---
+GET | /api/v1/auth/login | ✅ Működik (ha engedélyezve) | modules/financehub/backend/api/endpoints/auth.py
+GET | /api/v1/auth/callback | ✅ Működik (ha engedélyezve) | modules/financehub/backend/api/endpoints/auth.py
+GET | /api/v1/auth/status | ✅ Működik (ha engedélyezve) | modules/financehub/backend/api/endpoints/auth.py
+GET | /api/v1/auth/logout | ✅ Működik (ha engedélyezve) | modules/financehub/backend/api/endpoints/auth.py
+# --- Stock ---
+GET | /api/v1/stock/search | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/search/search_stock.py
+GET | /api/v1/stock/ticker-tape | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py
+GET | /api/v1/stock/ticker-tape/item | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py
+# --- Stock (Refaktorált Path-ek) ---
+GET | /api/v1/stock/{ticker}/chart | 🟡 Refaktorálás alatt | modules/financehub/backend/api/endpoints/stock_endpoints/chart/chart_data.py
+GET | /api/v1/stock/{ticker}/fundamentals | 🟡 Refaktorálás alatt | modules/financehub/backend/api/endpoints/stock_endpoints/fundamentals/fundamentals_stock.py
+GET | /api/v1/stock/{ticker}/news | 🟡 Refaktorálás alatt | modules/financehub/backend/api/endpoints/stock_endpoints/news/news_stock.py
+GET | /api/v1/stock/{ticker}/summary | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/router.py
+GET | /api/v1/stock/{ticker}/technical | 🟡 Refaktorálás alatt | modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py
+# --- Chat ---
+POST | /api/v1/stock/chat/{ticker}/stream | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py
+POST | /api/v1/stock/chat/{ticker}/deep | ✅ Működik | modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py
+POST | /api/v1/stock/chat/{ticker} | 🚧 Implementálásra vár | modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py
+# --- Macro ---
+GET | /api/v1/macro/rates/all | ✅ Működik | modules/financehub/backend/api/endpoints/macro/rates.py
+GET | /api/v1/macro/bubor | 📝 Tervezett | -
+# --- Market ---
+GET | /api/v1/market/news | ✅ Működik | modules/financehub/backend/api/market_data.py
+# --- Forex (Tervezett) ---
+GET | /api/v1/forex/{pair} | 📝 Tervezett | -
+GET | /api/v1/forex/pairs | 📝 Tervezett | -
+# --- Crypto (Tervezett) ---
+GET | /api/v1/crypto/{symbol} | 📝 Tervezett | -
+GET | /api/v1/crypto/symbols | 📝 Tervezett | -
+# --- EODHD (Tervezett) ---
+GET | /api/v1/eodhd/{ticker}/{dataset} | 📝 Tervezett | -
+# --- Config (Tervezett) ---
+POST | /api/v1/config/language | 📝 Tervezett | -
+POST | /api/v1/config/model | 📝 Tervezett | -
+# --- Metrics ---
+GET | /metrics | ✅ Működik | modules/financehub/backend/core/metrics/prometheus_exporter.py 

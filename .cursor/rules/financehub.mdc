@@ -1,0 +1,69 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# ─────────────────────────────────────────────────────────────
+#  FINANCEHUB_STOCKS_RULE              v1.0   (2025-07-09)
+#  overlay for: rules/AEVOREX_MASTER_RULE v3.0
+# ─────────────────────────────────────────────────────────────
+inherit: AEVOREX_MASTER_RULE           # örököl minden baseline-t
+
+module: financehub/stocks              # csak erre a view-ra
+
+mission: >
+  A Stocks oldal villámgyors, Bloomberg-szintű equity-research
+  élményt nyújt, tokenenként streamelt AI-összefoglalóval.
+
+scope:
+  frontend:
+    path: modules/financehub/frontend/src/pages/StockPage.*
+  backend:
+    path: modules/financehub/backend/**          # vonatkozó végpontok
+    endpoints:
+      - GET  /api/v1/stock/{ticker}
+      - GET  /api/v1/stock/{ticker}/ai-analysis
+  docs:
+    tags: [financehub, equity-research]
+
+overrides:
+  quality_gates:
+    component_max_loc: 160          # kötelező LOC-limit
+    lighthouse: 92                  # magasabb UX cél
+  constraints:
+    ask_first: [new_file, external_dependency]
+    forbidden: [mock_data, inline_css, emoji_ui]
+  extra_quality_gate: dark_mode_consistency
+
+ui_contract:
+  immutable_sections:
+    - header_ticker_tape           # nem bontható külön komponensre
+    - analysis_bubble_grid         # négy fix buborék egy komponensként
+    - tradingview_advanced_chart
+    - ai_summary_chat_stream
+  user_exp:
+    - skeleton_shimmer_max_ms: 200
+    - 60fps_animations: true
+    - mobile_feature_parity: true
+
+data_propagation:
+  new_backend_field_window_hours: 72   # mező ≤3 nap alatt jelenjen meg a UI-ban
+  preprocessing_pipeline:
+    min_length: 5
+    relevance_score: 0.6
+    template_root: prompt_templates/financehub/
+
+checklist:
+  - repo_scan_done
+  - endpoint_matrix_synced
+  - docs_sync_comment_added
+  - dark_mode_visual_diff_pass
+  - lighthouse_score_≥92
+
+signature:
+  required: true                      # commit msg-ben
+  format: "[agent] <model> • Target: financehub/stocks • Strength: … • Weakness: …"
+
+version: 1.0
+updated: 2025-07-09
+# ─────────────────────────────────────────────────────────────

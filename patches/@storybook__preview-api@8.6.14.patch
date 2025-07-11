@@ -1,0 +1,14 @@
+{
+  "exports": {
+    ".": {
+      "types": "./shim.d.ts",
+      "import": "./shim.mjs",
+      "require": "./shim.js"
+    },
+    "./package.json": "./package.json",
+    "./internal/preview/runtime": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  }
+} 

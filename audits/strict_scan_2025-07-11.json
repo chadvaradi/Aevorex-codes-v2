@@ -1,0 +1,432 @@
+{
+  "summary": {
+    "ok_full": 70,
+    "error_payload": 0,
+    "empty_200": 0,
+    "4xx": 0,
+    "5xx": 0,
+    "other": 0
+  },
+  "details": [
+    {
+      "path": "/api/v1/health",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/rates",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/monetary-policy",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/retail-rates",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/yield-curve",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/yield-curve/lite",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/historical-yield-curve",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/fx",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/fx/legacy",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/comprehensive",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/monetary-aggregates",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/inflation",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/components",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/health",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/indicators",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/latest",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bsi/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/mir/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/components",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/alt",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/health",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/ivf/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/cbd/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/rpp/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/cpp/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bls/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/spf/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/ciss/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/trd/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/pss/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/irs/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/hicp/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/rates/all",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/curve/{source}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/bubor",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/forex/pairs",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/forex/{pair}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/search",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/finance",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}/stream",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}/stream",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}/deep",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/chart",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/fundamentals",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/news",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/premium/{ticker}/summary",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/premium/technical-analysis/{ticker}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/premium/technical-analysis/{ticker}/full",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/premium/technical-analysis/quote/{ticker}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/ticker-tape/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/ticker-tape/test",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/ticker-tape/item",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/summary",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/technical",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/model",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/deep",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/language",
+      "method": "post",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/login",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/callback",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/status",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/logout",
+      "method": "post",
+      "status": 204,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/crypto/symbols",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/crypto/{symbol}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/market/news",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/eodhd/{ticker}/{dataset}",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/ai/models/",
+      "method": "get",
+      "status": 200,
+      "result": "ok_full"
+    }
+  ]
+}

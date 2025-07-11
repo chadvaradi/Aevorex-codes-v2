@@ -1,0 +1,6 @@
+user_overlay:
+  explain_like_i_m_pm: true          # PM-friendly 5-sentence summary required per PR
+  daily_digest: "slack:#ae-core"     # Channel where CI bot posts daily digest
+  ask_me_first: "4h"                 # Ping PM if estimate > 4h
+  ux_snapshot: true                  # Before/after GIF required for UI changes
+  risk_flag: true                    # Auto high-risk label for fin/compliance PRs 

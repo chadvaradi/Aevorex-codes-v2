@@ -1,0 +1,5 @@
+shared/frontend/src/hooks/stock/useTickerTapeData.ts:        const data = await get<TickerTapeItem[]>('/stock/ticker-tape/');
+shared/frontend/src/hooks/stock/useStockPageData.ts:                    get<FundamentalsResponse>(`/stock/fundamentals/${ticker}`),
+shared/frontend/src/hooks/stock/useStockPageData.ts:                    get<NewsResponse>(`/stock/news/${ticker}`),
+shared/frontend/src/hooks/stock/useStockPageData.ts:                    get<ChartResponse>(`/stock/chart/${ticker}`),
+shared/frontend/src/hooks/stock/useStockPageData.ts:                    get<AiSummaryResponse>(`/stock/ai-summary/${ticker}`),

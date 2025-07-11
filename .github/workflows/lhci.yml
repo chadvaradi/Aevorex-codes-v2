@@ -1,0 +1,69 @@
+name: LHCI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared/frontend/**'
+  push:
+    branches: [main]
+    paths:
+      - 'shared/frontend/**'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm --filter @aevorex/shared-frontend build
+
+      - name: Run Lighthouse CI
+        if: ${{ vars.LHCI_GITHUB_APP_TOKEN != '' }}
+        run: |
+          pnpm global add @lhci/cli@0.13.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ vars.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Post Lighthouse summary to Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_LHCI_WEBHOOK }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            SCORE=$(cat ./lhci_reports.json | jq '.summary.performance') || SCORE="N/A"
+            curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"LHCI run completed. Performance score: $SCORE\"}" $SLACK_WEBHOOK_URL
+          else
+            echo 'Slack webhook not configured, skipping notification.'
+          fi
+
+      - name: Create Grafana annotation
+        if: always()
+        env:
+          GRAFANA_URL: ${{ vars.GRAFANA_URL }}
+          GRAFANA_API_KEY: ${{ vars.GRAFANA_API_KEY }}
+        run: |
+          if [ -n "$GRAFANA_URL" ] && [ -n "$GRAFANA_API_KEY" ]; then
+            TIMESTAMP=$(date +%s000)
+            curl -X POST "$GRAFANA_URL/api/annotations" \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $GRAFANA_API_KEY" \
+              --data '{"time":'"$TIMESTAMP"', "tags":["lhci"], "text":"LHCI run completed on ${{ github.sha }}"}'
+          else
+            echo 'Grafana annotation variables not set, skipping.'
+          fi 

@@ -1,0 +1,14 @@
+shared/frontend/src/hooks/auth/useAuth.tsx:        const response = await fetch('/api/v1/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:    window.location.href = '/api/v1/auth/login';
+shared/frontend/src/hooks/auth/useAuth.tsx:        await fetch('/api/v1/auth/logout');
+shared/frontend/src/hooks/auth/useAuth.tsx:        const data = await api.get<{ user: User | null }>('/api/v1/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:    window.location.href = '/api/v1/auth/login';
+shared/frontend/src/hooks/auth/useAuth.tsx:      await api.post('/api/v1/auth/logout', {});
+shared/frontend/src/hooks/macro/useMacroRates.ts:const API_ENDPOINT = '/api/v1/macro/rates/all';
+shared/frontend/src/hooks/macro/useForexRates.ts:  const { data, error, isLoading } = useSWR<ForexPairs>('/api/v1/macro/forex/pairs', api.get);
+shared/frontend/src/hooks/macro/useForexRates.ts:    pair ? `/api/v1/macro/forex/${pair}` : null,
+shared/frontend/src/hooks/macro/useBuborRates.ts:  const { data, error, isLoading } = useSWR<BuborRates>('/api/v1/macro/bubor', api.get);
+shared/frontend/src/hooks/stock/useSearchData.ts:        `/api/v1/stock/search?q=${encodeURIComponent(query)}&limit=10`
+shared/frontend/src/hooks/stock/useChatStream.ts:    const es = new EventSource(`/api/v1/stock/chat/${ticker}/stream`);
+shared/frontend/src/lib/api.ts:  const response = await fetch(url, {
+shared/frontend/src/lib/api.ts:  const response = await fetch(url, {

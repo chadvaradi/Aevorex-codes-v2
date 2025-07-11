@@ -1,0 +1,340 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables */
+:root {
+  --header-h: 64px;
+  --sub-header-h: 40px;
+  --ticker-h: 32px;
+}
+
+/* Dark mode surface color override */
+.dark {
+  --surface: #111827; /* gray-900 */
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus styles */
+*:focus {
+  outline: 2px solid theme('colors.primary.500');
+  outline-offset: 2px;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Marquee animation for TickerTape */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 60s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Utility classes */
+.drawer-open {
+  transform: translateX(0);
+}
+
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-2 border-gray-200 border-t-primary;
+}
+
+/* Skeleton loading */
+.skeleton {
+  @apply bg-gray-200 dark:bg-gray-700 animate-pulse rounded;
+}
+
+/* Shimmer effect */
+.shimmer {
+  background: linear-gradient(90deg, 
+    theme('colors.gray.200') 25%, 
+    theme('colors.gray.100') 50%, 
+    theme('colors.gray.200') 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, 
+    theme('colors.gray.700') 25%, 
+    theme('colors.gray.600') 50%, 
+    theme('colors.gray.700') 75%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Typography improvements */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Button focus improvements */
+button:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary;
+}
+
+/* Dropdown animations */
+.dropdown-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Smooth transitions for micro-interactions */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scale animation for button presses */
+.scale-on-press:active {
+  transform: scale(0.95);
+}
+
+/* Tab underline animation */
+.tab-underline {
+  position: relative;
+}
+
+.tab-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: theme('colors.primary.500');
+  transition: width 0.3s ease;
+}
+
+.tab-underline:hover::after {
+  width: 100%;
+}
+
+/* Hamburger rotation animation */
+.hamburger-rotate {
+  transition: transform 0.3s ease;
+}
+
+.hamburger-rotate.open {
+  transform: rotate(180deg);
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-full: 9999px;
+
+    /* FinanceHub Specific Tokens */
+    --fh-gain-emerald: 145 87% 39%;
+    --fh-gain-emerald-soft: 145 87% 96%;
+    --fh-loss-crimson: 345 100% 47%;
+    --fh-loss-crimson-soft: 345 100% 97%;
+    --fh-neutral-slate: 215 14% 34%;
+    --fh-accent-gold: 45 93% 47%;
+
+    /* Chat Overlay Specific Tokens - Updated for Full-Screen */
+    --chat-overlay-z: 90;
+    --chat-input-height: 60px;
+    --chat-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --chat-glass-bg: rgba(255, 255, 255, 0.8);
+    --chat-glass-border: rgba(255, 255, 255, 0.2);
+    --chat-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --chat-backdrop-blur: 12px;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    /* Chat Overlay Dark Mode - Updated */
+    --chat-glass-bg: rgba(0, 0, 0, 0.6);
+    --chat-glass-border: rgba(255, 255, 255, 0.1);
+    --chat-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@layer utilities {
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: #e2e8f0; /* bg-gray-200 */
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Chat Overlay Utilities - Updated for Full-Screen UX */
+  .chat-overlay {
+    @apply fixed inset-0 z-[var(--chat-overlay-z)] bg-white dark:bg-neutral-900;
+    will-change: transform;
+  }
+
+  .chat-safe-area {
+    padding-bottom: var(--chat-safe-area-bottom);
+  }
+
+  /* Character-by-character streaming cursor */
+  .typing-cursor {
+    @apply inline-block w-0.5 h-5 bg-blue-500;
+    animation: blink 1s infinite;
+    will-change: opacity;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Responsive breakpoints for chat */
+  @media (max-width: 640px) {
+    .chat-messages {
+      @apply px-4;
+    }
+    
+    .chat-input-container {
+      @apply w-[96%];
+    }
+  }
+
+  @media (min-width: 640px) {
+    .chat-messages {
+      @apply px-8;
+    }
+    
+    .chat-input-container {
+      @apply w-10/12;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .chat-messages {
+      @apply px-16;
+    }
+    
+    .chat-input-container {
+      @apply w-8/12;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .chat-input-container {
+      @apply w-7/12;
+    }
+  }
+} 

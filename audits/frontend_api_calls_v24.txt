@@ -1,0 +1,12 @@
+shared/frontend/src/hooks/auth/useAuth.tsx:        const response = await fetch('/api/v1/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:        await fetch('/api/v1/auth/logout');
+shared/frontend/src/hooks/auth/useAuth.tsx:        const data = await api.get<{ user: User | null }>('/api/v1/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:      await api.post('/api/v1/auth/logout', {});
+shared/frontend/src/hooks/macro/useForexRates.ts:  const { data, error, isLoading } = useSWR<ForexPairs>('/api/v1/macro/forex/pairs', api.get);
+shared/frontend/src/hooks/macro/useForexRates.ts:    api.get
+shared/frontend/src/hooks/macro/useBuborRates.ts:  const { data, error, isLoading } = useSWR<BuborRates>('/api/v1/macro/bubor', api.get);
+shared/frontend/src/hooks/stock/useSearchData.ts:      const results = await api.get<SearchResult[]>(
+shared/frontend/src/hooks/stock/useTickerTapeData.ts:        // A hibakezelést és a toast üzeneteket már az `api.ts` `get` funkciója kezeli.
+shared/frontend/src/hooks/stock/useStockPageData.ts:                // A toast hibaüzenetet már az `api.ts` kezeli.
+shared/frontend/src/lib/api.ts:  const response = await fetch(url, {
+shared/frontend/src/lib/api.ts:  const response = await fetch(url, {

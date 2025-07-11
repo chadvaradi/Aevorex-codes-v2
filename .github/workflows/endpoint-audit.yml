@@ -1,0 +1,44 @@
+name: Endpoint Matrix Audit
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies (backend only)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true  # fallback if monorepo uses poetry
+          pip install -r modules/financehub/backend/requirements.in || true
+
+      - name: Run Endpoint Audit (strict)
+        env:
+          FINBOT_API_KEYS__EODHD: dummy-ci-key
+        run: |
+          python scripts/run_endpoint_audit.py --strict
+
+      - name: Generate Matrix TSV (CI)
+        env:
+          FINBOT_API_KEYS__EODHD: dummy-ci-key
+        run: |
+          python scripts/generate_endpoint_matrix.py -v ci
+
+      - name: Upload matrix artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: endpoint-matrix-ci
+          path: audits/ENDPOINT_MATRIX_ci.tsv 

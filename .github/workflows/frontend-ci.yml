@@ -1,0 +1,104 @@
+name: Shared Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'shared/frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared/frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shared/frontend
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: shared/frontend/pnpm-lock.yaml
+
+      - name: Check for Google Auth Secrets
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          GOOGLE_AUTH_CLIENT_ID: ${{ vars.GOOGLE_AUTH_CLIENT_ID }}
+          GOOGLE_AUTH_CLIENT_SECRET: ${{ vars.GOOGLE_AUTH_CLIENT_SECRET }}
+        run: |
+          if [ -z "$GOOGLE_AUTH_CLIENT_ID" ] || [ -z "$GOOGLE_AUTH_CLIENT_SECRET" ]; then
+            echo "::error::One or more required Google Auth secrets (GOOGLE_AUTH_CLIENT_ID, GOOGLE_AUTH_CLIENT_SECRET) are not set."
+            exit 1
+          else
+            echo "✅ All required Google Auth secrets are present."
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint -- --max-warnings=0
+      - name: Build
+        run: pnpm build
+      - name: Test
+        run: pnpm test
+      - name: Persist turbo cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: turbo-cache
+          path: shared/frontend/.turbo
+      - name: Run E2E tests
+        run: pnpm exec playwright test
+        env:
+          # This would be set from GitHub Secrets in a real scenario
+          MOCK_USER_SESSION: ${{ vars.MOCK_USER_SESSION }}
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  matrix-drift-check:
+    name: "🛡️ API Matrix Drift Check"
+    runs-on: ubuntu-latest
+    needs: build # Run after build to ensure code is valid
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r modules/financehub/backend/requirements.txt
+
+      - name: Generate Raw Endpoint Matrix
+        run: |
+          source venv/bin/activate
+          python tools/runtime_endpoint_lister.py > docs/ENDPOINT_MATRIX_AUTO_v24.json
+
+      - name: Generate Frontend Usage Matrix
+        run: |
+          grep -R "fetch(" shared/frontend > docs/FE_USAGE_MATRIX_v24.txt
+
+      - name: Normalize and Diff
+        run: |
+          source venv/bin/activate
+          python scripts/normalize_matrix.py docs/ENDPOINT_MATRIX_AUTO_v24.json --output audits/ENDPOINT_MATRIX_v24_normalized.tsv --frontend-usage docs/FE_USAGE_MATRIX_v24.txt
+          git diff --exit-code -- audits/ENDPOINT_MATRIX_v24_normalized.tsv 

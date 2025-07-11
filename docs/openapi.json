@@ -1,0 +1,526 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AEVOREX FinanceHub API",
+    "description": "REST API for the AEVOREX FinanceHub, providing real-time stock data, news, and AI-driven analysis.",
+    "version": "2.5.0"
+  },
+  "paths": {
+    "/api/v1/auth/login": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Auth"
+        ],
+        "summary": "Login",
+        "description": "Redirects the user to Google's authentication page.",
+        "operationId": "login_api_v1_auth_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/callback": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Auth"
+        ],
+        "summary": "Callback",
+        "description": "Handles the callback from Google after user authentication.",
+        "operationId": "callback_api_v1_auth_callback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/status": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Auth"
+        ],
+        "summary": "Auth Status",
+        "description": "Returns the current user's authentication status.",
+        "operationId": "auth_status_api_v1_auth_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "get": {
+        "tags": [
+          "Authentication",
+          "Auth"
+        ],
+        "summary": "Logout",
+        "description": "Clears the user's session, effectively logging them out.",
+        "operationId": "logout_api_v1_auth_logout_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/market/news": {
+      "get": {
+        "tags": [
+          "Market Data",
+          "Market Data"
+        ],
+        "summary": "Get latest market-wide news",
+        "description": "Retrieves latest market news articles",
+        "operationId": "get_market_news_api_v1_market_news_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Number of news items to return",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Number of news items to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of news articles with metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Get Market News Api V1 Market News Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ai/models": {
+      "get": {
+        "tags": [
+          "AI Services",
+          "AI"
+        ],
+        "summary": "List all available AI models",
+        "description": "Public endpoint returning the centrally-maintained model list.",
+        "operationId": "list_models_api_v1_ai_models_get",
+        "responses": {
+          "200": {
+            "description": "Array of model metadata objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelMeta"
+                  },
+                  "type": "array",
+                  "title": "Response List Models Api V1 Ai Models Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ai/models/models": {
+      "get": {
+        "tags": [
+          "AI Services",
+          "AI"
+        ],
+        "summary": "Get Available Models",
+        "description": "Returns the catalogue of available AI models.",
+        "operationId": "get_available_models_api_v1_ai_models_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Get Available Models Api V1 Ai Models Models Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/macro/bubor/": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy",
+          "Macroeconomic Data",
+          "BUBOR"
+        ],
+        "summary": "Get BUBOR Rates",
+        "description": "Returns the latest BUBOR rates.\n(Currently using mock data).",
+        "operationId": "get_bubor_rates_api_v1_macro_bubor__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/macro/forex/pairs": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy",
+          "Macroeconomic Data",
+          "Forex"
+        ],
+        "summary": "Get Supported Forex Pairs",
+        "description": "Returns a list of supported Forex pairs.",
+        "operationId": "get_forex_pairs_api_v1_macro_forex_pairs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/macro/forex/{pair}": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy",
+          "Macroeconomic Data",
+          "Forex"
+        ],
+        "summary": "Get Forex Rate for a Pair",
+        "description": "Returns the latest rate for a specific Forex pair.\n(Currently using mock data).",
+        "operationId": "get_forex_rate_api_v1_macro_forex__pair__get",
+        "parameters": [
+          {
+            "name": "pair",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Forex pair symbol",
+              "title": "Pair"
+            },
+            "description": "Forex pair symbol",
+            "example": "EURUSD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/macro/rates/all": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy"
+        ],
+        "summary": "Get All Macro Rates",
+        "description": "Get complete macro rates spectrum - ECB policy rates, BUBOR curve, FX rates.",
+        "operationId": "get_all_macro_rates_api_v1_macro_rates_all_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/macro/all": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy"
+        ],
+        "summary": "Get Macro All Legacy",
+        "description": "[DEPRECATED] Use /rates/all instead.\nGet complete macro rates spectrum - ECB policy rates, BUBOR curve, FX rates.",
+        "operationId": "get_macro_all_legacy_api_v1_macro_all_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/macro/curve/{source}": {
+      "get": {
+        "tags": [
+          "Macroeconomic Data",
+          "Macro - Aggregate & Legacy"
+        ],
+        "summary": "Get Curve Legacy",
+        "description": "[DEPRECATED] This endpoint is ambiguous and will be removed.\nUse /ecb/policy-rates or /bubor/curve instead.",
+        "operationId": "get_curve_legacy_api_v1_macro_curve__source__get",
+        "deprecated": true,
+        "parameters": [
+          {
+            "name": "source",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "bubor",
+                "ecb"
+              ],
+              "type": "string",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ModelMeta": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Provider/model identifier on OpenRouter"
+          },
+          "ctx": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ctx",
+            "description": "Context window (tokens)"
+          },
+          "price_in": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Price In",
+            "description": "USD / 1K tokens in"
+          },
+          "price_out": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Price Out",
+            "description": "USD / 1K tokens out"
+          },
+          "strength": {
+            "type": "string",
+            "title": "Strength",
+            "description": "Few-word marketing strength"
+          },
+          "ux_hint": {
+            "type": "string",
+            "title": "Ux Hint",
+            "description": "Short hint for UX grouping"
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "description": "Long-form notes for advanced UIs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "price_in",
+          "price_out",
+          "strength",
+          "ux_hint",
+          "notes"
+        ],
+        "title": "ModelMeta"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

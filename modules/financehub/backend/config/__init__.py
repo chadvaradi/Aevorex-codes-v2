@@ -1,0 +1,69 @@
+"""
+Central configuration module for the Aevorex FinBot Backend.
+
+This __init__.py file orchestrates the modular configuration by:
+1. Importing all individual setting classes from their respective files.
+2. Composing them into a single, top-level `Settings` model.
+3. Instantiating a global `settings` object to be used throughout the application.
+"""
+
+from .env_loader import load_environment_once
+
+# Load environment variables once (idempotens)
+load_environment_once()
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Import individual settings classes
+from .meta import ApplicationMetaSettings
+from .environment import EnvironmentSettings
+from .paths import PathSettings
+from .cors import CorsSettings
+from .api_keys import APIKeysSettings
+from .auth import GoogleAuthSettings
+from .redis import RedisSettings
+from .uvicorn import UvicornSettings
+from .http import HttpClientSettings
+from .cache import CacheSettings
+from .data_source import DataSourceSettings
+from .eodhd import EODHDFeaturesSettings
+from .ai import AISettings
+from .news import NewsProcessingSettings
+from .data_processing import DataProcessingSettings
+from .ticker_tape import TickerTapeSettings
+from .file_processing import FileProcessingSettings
+
+class Settings(BaseSettings):
+    """
+    Aevorex FinBot Backend central configuration model.
+    """
+    API_PREFIX: str = Field(default="/api/v1", description="Global prefix for API endpoints.")
+
+    # Embedded settings groups
+    APP_META: ApplicationMetaSettings = Field(default_factory=ApplicationMetaSettings)
+    ENVIRONMENT: EnvironmentSettings = Field(default_factory=EnvironmentSettings)
+    PATHS: PathSettings = Field(default_factory=PathSettings)
+    CORS: CorsSettings = Field(default_factory=CorsSettings)
+    API_KEYS: APIKeysSettings = Field(default_factory=APIKeysSettings)
+    GOOGLE_AUTH: GoogleAuthSettings = Field(default_factory=GoogleAuthSettings)
+    REDIS: RedisSettings = Field(default_factory=RedisSettings)
+    UVICORN: UvicornSettings = Field(default_factory=UvicornSettings)
+    HTTP_CLIENT: HttpClientSettings = Field(default_factory=HttpClientSettings)
+    CACHE: CacheSettings = Field(default_factory=CacheSettings)
+    DATA_SOURCE: DataSourceSettings = Field(default_factory=DataSourceSettings)
+    EODHD_FEATURES: EODHDFeaturesSettings = Field(default_factory=EODHDFeaturesSettings)
+    AI: AISettings = Field(default_factory=AISettings)
+    NEWS: NewsProcessingSettings = Field(default_factory=NewsProcessingSettings)
+    DATA_PROCESSING: DataProcessingSettings = Field(default_factory=DataProcessingSettings)
+    TICKER_TAPE: TickerTapeSettings = Field(default_factory=TickerTapeSettings)
+    FILE_PROCESSING: FileProcessingSettings = Field(default_factory=FileProcessingSettings)
+
+    model_config = SettingsConfigDict(
+        env_nested_delimiter='__',
+        env_file="env.local",
+        extra="ignore"
+    )
+
+# Instantiate the global settings object
+settings = Settings() 

@@ -1,0 +1,57 @@
+rule_id: "rule_0"
+version: "2.1"
+updated: "2025-07-09"
+
+mission: "Prémium UX, minimális tech-adósság."
+
+# Ordered list – each stage must pass before proceeding
+action_workflow:
+  - id: SCAN
+    description: "Full repository scan & Rule #008 parity check"
+  - id: DRAFT
+    description: "Draft architecture & implementation plan – requires Owner Approval"
+  - id: IMPLEMENT
+    description: "Implement single-issue, horizontally + vertically consistent changes"
+  - id: TEST
+    description: "Run unit, integration, e2e test suites & lint/typecheck"
+  - id: REVIEW
+    description: "CODEOWNERS review / PM summary accepted"
+  - id: MERGE
+    description: "CI green gates, release notes & version bump"
+
+constraints:
+  allowed:
+    - "Refactor existing modules"
+    - "Add tests or docs"
+    - "Optimize performance"
+  ask_first:
+    - "Create new file or directory"
+    - "Change public API contract"
+    - "Upgrade dependency major version"
+  forbidden:
+    - "Mock data in production code"
+    - "Emoji in UI or commit messages"
+    - "Commits under deprecated paths (e.g. modules/financehub/frontend)"
+
+quality_gates:
+  component_max_loc: 180   # baseline – may be overridden per-module overlay
+  lighthouse_min_score: 90
+  eslint_zero_errors: true
+  ruff_zero_errors: true
+  test_coverage_min: 80
+
+# Handy commands & shortcuts
+tooling_tips:
+  - "turbo run lint --filter=financehub"
+  - "scripts/dev-all.sh → start full stack locally"
+  - "pnpm test --filter shared/frontend"
+  - "poetry run pytest modules/financehub/backend"
+
+ci_assertions:
+  - "validate_rule0"        # YAML schema + diff check
+  - "validate_rule008"      # Module sync audit
+  - "validate_overlays"     # Overlay files syntax & merge
+
+module_overlays:
+  # Overlays located in module_overlays/<module>.yaml
+  financehub: "module_overlays/financehub.yaml" 

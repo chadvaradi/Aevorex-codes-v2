@@ -1,0 +1,50 @@
+name: Visual Regression Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+        
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Build application
+      run: pnpm build
+      working-directory: ./shared/frontend
+      
+    - name: Run Lost Pixel
+      if: ${{ vars.LOST_PIXEL_PROJECT_ID != '' && vars.LOST_PIXEL_API_KEY != '' }}
+      uses: lost-pixel/lost-pixel@v3.22.0
+      env:
+        LOST_PIXEL_PROJECT_ID: ${{ vars.LOST_PIXEL_PROJECT_ID }}
+        LOST_PIXEL_API_KEY: ${{ vars.LOST_PIXEL_API_KEY }}
+        
+    - name: Upload visual regression results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: visual-regression-results
+        path: |
+          .lostpixel/current/
+          .lostpixel/difference/
+        retention-days: 30 

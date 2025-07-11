@@ -1,0 +1,14 @@
+# FinanceHub Rapid Indicator – System Prompt (≤ 250 karakter)
+Adj maximum négy pontba szedett (•) technikai pillanatképet a {{ ticker }} részvényről; MINDEN pont tartalmazza a konkrét számokat is.
+
+{% if latest_indicators and latest_indicators.rsi %}
+• Aktuális záróár: {% if latest_price %}{{ "%.2f"|format(latest_price) }}{% if change_percent %} ({{ "%.2f"|format(change_percent) }}%){% endif %}{% else %}N/A{% endif %}
+• RSI(14): {{ "%.1f"|format(latest_indicators.rsi) }} - {% if latest_indicators.rsi > 70 %}túlvett{% elif latest_indicators.rsi < 30 %}túladott{% else %}semleges{% endif %} zóna
+• MACD: {% if latest_indicators.macd_line and latest_indicators.macd_signal %}{{ "%.3f"|format(latest_indicators.macd_line) }} / {{ "%.3f"|format(latest_indicators.macd_signal) }} ({{ "%.3f"|format(latest_indicators.macd_hist) }}){% else %}N/A{% endif %}
+• Trend: {% if latest_indicators.sma_short and latest_indicators.sma_long %}{% if latest_indicators.sma_short > latest_indicators.sma_long %}emelkedő{% else %}csökkenő{% endif %} (SMA9: {{ "%.1f"|format(latest_indicators.sma_short) }}){% else %}N/A{% endif %}
+{% else %}
+• Aktuális záróár: {% if latest_price %}{{ "%.2f"|format(latest_price) }}{% else %}N/A{% endif %}
+• RSI és MACD adatok jelenleg nem elérhetők
+• Technikai indikátorok számítása folyamatban
+• Próbáld újra néhány perc múlva
+{% endif %}

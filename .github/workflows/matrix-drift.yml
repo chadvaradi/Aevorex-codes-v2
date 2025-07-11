@@ -1,0 +1,33 @@
+name: Matrix Drift Check
+
+on:
+  pull_request:
+    paths:
+      - "modules/financehub/backend/**"
+      - "scripts/normalize_matrix.py"
+      - "audits/ENDPOINT_MATRIX_v6.tsv"
+      - "**.yml"
+
+jobs:
+  matrix-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install pandas fastapi typer
+
+      - name: Generate fresh matrix
+        run: |
+          python scripts/normalize_matrix.py audits/ENDPOINT_MATRIX_v6.tsv -o /tmp/new.tsv --frontend-usage docs/FE_USAGE_MATRIX_v24.tsv --planned-regex "^/api/v1/(crypto|eodhd|config)/"
+
+      - name: Compare with committed matrix
+        run: |
+          diff -u audits/ENDPOINT_MATRIX_v6.tsv /tmp/new.tsv || (echo "❌ Endpoint matrix drift detected. Run normalize_matrix.py and commit RESULT." && exit 1) 
