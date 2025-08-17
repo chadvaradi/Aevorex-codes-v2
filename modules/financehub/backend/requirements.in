@@ -12,6 +12,7 @@ pandas-ta
 numpy==1.26.4
 scikit-learn
 yfinance
+ta-lib
 
 # Async & Jobs
 celery
