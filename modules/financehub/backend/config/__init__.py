@@ -33,12 +33,19 @@ from .news import NewsProcessingSettings
 from .data_processing import DataProcessingSettings
 from .ticker_tape import TickerTapeSettings
 from .file_processing import FileProcessingSettings
+from .subscription import SubscriptionSettings
 
 class Settings(BaseSettings):
     """
     Aevorex FinBot Backend central configuration model.
     """
     API_PREFIX: str = Field(default="/api/v1", description="Global prefix for API endpoints.")
+    
+    # Database configuration
+    DATABASE_URL: str = Field(
+        default="postgresql://username:password@localhost:5432/financehub",
+        description="PostgreSQL database connection URL for subscription data"
+    )
 
     # Embedded settings groups
     APP_META: ApplicationMetaSettings = Field(default_factory=ApplicationMetaSettings)
@@ -58,6 +65,13 @@ class Settings(BaseSettings):
     DATA_PROCESSING: DataProcessingSettings = Field(default_factory=DataProcessingSettings)
     TICKER_TAPE: TickerTapeSettings = Field(default_factory=TickerTapeSettings)
     FILE_PROCESSING: FileProcessingSettings = Field(default_factory=FileProcessingSettings)
+    SUBSCRIPTION: SubscriptionSettings = Field(default_factory=SubscriptionSettings)
+    # Optional feature flags for fine-grained fallback control (NODE_ENV already gates behavior)
+    AI__ALLOW_FALLBACK: bool = Field(default=False)
+    NEWS__ALLOW_FALLBACK: bool = Field(default=False)
+    CRYPTO__ALLOW_FALLBACK: bool = Field(default=False)
+    MACRO__ALLOW_CACHE_FALLBACK: bool = Field(default=False)
+    AUTH__ALLOW_MOCK: bool = Field(default=False)
 
     model_config = SettingsConfigDict(
         env_nested_delimiter='__',
