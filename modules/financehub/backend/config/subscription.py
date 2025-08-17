@@ -215,6 +215,16 @@ class SubscriptionSettings(BaseSettings):
         description="Admin API key for metrics access"
     )
     
+    # Rate limiting configuration
+    WEBHOOK_RATE_LIMIT: str = Field(
+        default="60/minute",
+        description="Rate limit for webhook endpoints"
+    )
+    API_RATE_LIMIT: str = Field(
+        default="1000/minute", 
+        description="Rate limit for public API endpoints"
+    )
+    
     # Plan limits
     FREE_PLAN_DAILY_REQUESTS: int = Field(
         default=100, 

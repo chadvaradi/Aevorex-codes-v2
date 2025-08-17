@@ -141,12 +141,15 @@ async def handle_lemonsqueezy_webhook(event_data: Dict[str, Any], sub_service: S
     event_name = event_data.get("event_name")
     data = event_data.get("data", {})
     
+    # Enhanced status mapping with comprehensive coverage
     status_mapping = {
         "active": SubscriptionStatus.ACTIVE,
         "trialing": SubscriptionStatus.TRIALING,
         "past_due": SubscriptionStatus.PAST_DUE,
         "cancelled": SubscriptionStatus.CANCELED,
-        "unpaid": SubscriptionStatus.UNPAID
+        "unpaid": SubscriptionStatus.UNPAID,
+        "paused": SubscriptionStatus.CANCELED,  # Treat paused as cancelled
+        "expired": SubscriptionStatus.CANCELED
     }
 
     plan_mapping = {
@@ -158,7 +161,26 @@ async def handle_lemonsqueezy_webhook(event_data: Dict[str, Any], sub_service: S
         "enterprise_yearly": SubscriptionPlan.ENTERPRISE,
     }
 
-    if event_name in ["subscription_created", "subscription_updated", "subscription_cancelled", "subscription_expired", "subscription_payment_succeeded"]:
+    # Comprehensive event mapping
+    subscription_events = [
+        "subscription_created",
+        "subscription_updated", 
+        "subscription_cancelled",
+        "subscription_expired",
+        "subscription_payment_succeeded",
+        "subscription_resumed",
+        "subscription_paused",
+        "subscription_unpaused"
+    ]
+    
+    payment_events = [
+        "order_created",
+        "order_refunded",
+        "subscription_payment_success",
+        "subscription_payment_failed"
+    ]
+    
+    if event_name in subscription_events:
         subscription = data.get("attributes", {})
         order = data.get("relationships", {}).get("order", {}).get("data", {}).get("attributes", {}) # order data for dates
 
@@ -166,7 +188,9 @@ async def handle_lemonsqueezy_webhook(event_data: Dict[str, Any], sub_service: S
         mapped_status = status_mapping.get(ls_status, SubscriptionStatus.INCOMPLETE)
         
         variant_id = subscription.get("variant_id")
-        plan = plan_mapping.get(str(variant_id), SubscriptionPlan.PRO)
+        # Use config-based plan mapping for flexibility
+        ls_config = settings.SUBSCRIPTION.LEMON_SQUEEZY
+        plan = ls_config.variant_to_plan_mapping.get(str(variant_id), SubscriptionPlan.PRO)
 
         # Convert dates
         # Lemon Squeezy dates are ISO 8601 strings with Z for UTC, datetime.fromisoformat handles it
@@ -208,6 +232,32 @@ async def handle_lemonsqueezy_webhook(event_data: Dict[str, Any], sub_service: S
             trial_end=trial_end
         )
         logger.info(f"Lemon Squeezy subscription {event_name}: {subscription.get('id')} for user {user_id} - {mapped_status}")
+        
+    elif event_name in payment_events:
+        # Handle payment-related events
+        order = data.get("attributes", {})
+        subscription_id = order.get("subscription_id")
+        
+        if event_name == "subscription_payment_failed":
+            # Update subscription status to past_due
+            await sub_service.update_subscription_status(
+                external_id=subscription_id,
+                provider=PaymentProvider.LEMON_SQUEEZY,
+                status=SubscriptionStatus.PAST_DUE
+            )
+            logger.info(f"Lemon Squeezy payment failed: {subscription_id}")
+            
+        elif event_name == "subscription_payment_success":
+            # Update subscription status to active
+            await sub_service.update_subscription_status(
+                external_id=subscription_id,
+                provider=PaymentProvider.LEMON_SQUEEZY,
+                status=SubscriptionStatus.ACTIVE
+            )
+            logger.info(f"Lemon Squeezy payment success: {subscription_id}")
+        
+    else:
+        logger.info(f"Unhandled Lemon Squeezy event: {event_name}")
         
     return {"status": "processed"}
 
@@ -277,11 +327,14 @@ async def stripe_webhook(request: Request):
 
 
 @router.post("/lemonsqueezy")
-@limiter.limit("60/minute")
 async def lemonsqueezy_webhook(
     request: Request, 
     sub_service: SubscriptionService = Depends(get_subscription_service)
 ):
+    """Handle Lemon Squeezy webhooks with dynamic rate limiting."""
+    # Apply rate limiting from config
+    rate_limit = settings.SUBSCRIPTION.WEBHOOK_RATE_LIMIT
+    await limiter.check_request_limit(request, rate_limit)
     """Handle Lemon Squeezy webhooks with HMAC signature verification and metrics."""
     global webhook_metrics
     
