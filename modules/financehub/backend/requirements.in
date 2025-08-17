@@ -3,6 +3,9 @@ fastapi
 flask>=3.1.1
 uvicorn[standard]
 
+# Database
+asyncpg>=0.29.0
+
 # Data & ML
 pandas
 pandas-ta
@@ -14,7 +17,6 @@ yfinance
 celery
 redis
 aiocache[redis]
-ta-lib-pure
 httpx
 tenacity
 
