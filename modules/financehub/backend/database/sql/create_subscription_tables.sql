@@ -57,3 +57,20 @@ CREATE TABLE IF NOT EXISTS webhook_events (
 -- Add index for faster lookups by event ID and provider
 CREATE INDEX IF NOT EXISTS idx_webhook_events_provider_id ON webhook_events (provider, id);
 CREATE INDEX IF NOT EXISTS idx_webhook_events_received ON webhook_events (received_at);
+
+-- Plan Mapping Table (for flexible plan configuration)
+CREATE TABLE IF NOT EXISTS plan_mappings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    provider VARCHAR(50) NOT NULL, -- 'lemonsqueezy', 'stripe', 'paddle'
+    external_id VARCHAR(255) NOT NULL, -- Provider-specific variant/price ID
+    plan VARCHAR(50) NOT NULL, -- 'free', 'pro', 'team', 'enterprise'
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    UNIQUE(provider, external_id)
+);
+
+-- Add index for plan mappings
+CREATE INDEX IF NOT EXISTS idx_plan_mappings_provider_external ON plan_mappings (provider, external_id);
+CREATE INDEX IF NOT EXISTS idx_plan_mappings_plan ON plan_mappings (plan);
+CREATE INDEX IF NOT EXISTS idx_plan_mappings_active ON plan_mappings (is_active) WHERE is_active = TRUE;

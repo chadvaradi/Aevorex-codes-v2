@@ -25,6 +25,20 @@ from ....core.services.subscription_service import get_subscription_service, Sub
 
 logger = logging.getLogger(__name__)
 
+# Metrics tracking
+webhook_metrics = {
+    "total_requests": 0,
+    "successful_requests": 0,
+    "failed_requests": 0,
+    "idempotency_conflicts": 0,
+    "signature_failures": 0,
+    "provider_events": {
+        "lemonsqueezy": {},
+        "stripe": {},
+        "paddle": {}
+    }
+}
+
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
 
@@ -261,7 +275,12 @@ async def lemonsqueezy_webhook(
     request: Request, 
     sub_service: SubscriptionService = Depends(get_subscription_service)
 ):
-    """Handle Lemon Squeezy webhooks with HMAC signature verification."""
+    """Handle Lemon Squeezy webhooks with HMAC signature verification and metrics."""
+    global webhook_metrics
+    
+    # Update metrics
+    webhook_metrics["total_requests"] += 1
+    
     try:
         # Get raw body for signature verification
         body = await request.body()
@@ -270,12 +289,16 @@ async def lemonsqueezy_webhook(
         signature = request.headers.get("x-signature")
         if not signature:
             logger.error("Lemon Squeezy webhook: Missing x-signature header")
+            webhook_metrics["signature_failures"] += 1
+            webhook_metrics["failed_requests"] += 1
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing signature")
         
         # Verify HMAC signature
         webhook_secret = settings.SUBSCRIPTION.LEMON_SQUEEZY.LEMON_SQUEEZY_WEBHOOK_SECRET.get_secret_value()
         if not verify_lemonsqueezy_signature(body, signature, webhook_secret):
             logger.error("Lemon Squeezy webhook: Invalid HMAC signature")
+            webhook_metrics["signature_failures"] += 1
+            webhook_metrics["failed_requests"] += 1
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
         
         # Parse event data
@@ -283,11 +306,17 @@ async def lemonsqueezy_webhook(
         event_id = event_data.get("id")
         event_name = event_data.get("event_name", "unknown")
         
+        # Track event type
+        if event_name not in webhook_metrics["provider_events"]["lemonsqueezy"]:
+            webhook_metrics["provider_events"]["lemonsqueezy"][event_name] = 0
+        webhook_metrics["provider_events"]["lemonsqueezy"][event_name] += 1
+        
         logger.info(f"Processing Lemon Squeezy webhook: {event_name} (ID: {event_id})")
         
         # Check idempotency
         if await sub_service.is_webhook_event_processed(event_id):
             logger.info(f"Lemon Squeezy webhook event {event_id} already processed")
+            webhook_metrics["idempotency_conflicts"] += 1
             return JSONResponse(content={"status": "already_processed"})
         
         # Process event
@@ -300,14 +329,17 @@ async def lemonsqueezy_webhook(
             event_name
         )
         
+        webhook_metrics["successful_requests"] += 1
         logger.info(f"Successfully processed Lemon Squeezy webhook: {event_name}")
         return JSONResponse(content=result)
         
     except HTTPException:
         # Re-raise HTTP exceptions
+        webhook_metrics["failed_requests"] += 1
         raise
     except Exception as e:
         logger.error(f"Lemon Squeezy webhook error: {e}")
+        webhook_metrics["failed_requests"] += 1
         # Always return 200 to Lemon Squeezy to prevent retries
         return JSONResponse(content={"status": "error", "message": "Internal processing error"})
 
@@ -342,3 +374,26 @@ async def paddle_webhook(request: Request):
 async def webhook_health():
     """Health check for webhook endpoints."""
     return {"status": "healthy", "endpoints": ["stripe", "lemonsqueezy", "paddle"]}
+
+
+@router.get("/metrics")
+async def webhook_metrics_endpoint():
+    """Get webhook metrics for monitoring."""
+    global webhook_metrics
+    
+    # Calculate success rate
+    total = webhook_metrics["total_requests"]
+    successful = webhook_metrics["successful_requests"]
+    failed = webhook_metrics["failed_requests"]
+    
+    success_rate = (successful / total * 100) if total > 0 else 0
+    
+    return {
+        "total_requests": total,
+        "successful_requests": successful,
+        "failed_requests": failed,
+        "success_rate_percent": round(success_rate, 2),
+        "idempotency_conflicts": webhook_metrics["idempotency_conflicts"],
+        "signature_failures": webhook_metrics["signature_failures"],
+        "provider_events": webhook_metrics["provider_events"]
+    }
