@@ -112,6 +112,18 @@ class LemonSqueezySettings(BaseSettings):
         description="Whether Lemon Squeezy is enabled"
     )
     
+    @property
+    def variant_to_plan_mapping(self) -> dict[str, str]:
+        """Map Lemon Squeezy variant IDs to subscription plans."""
+        return {
+            self.LEMON_SQUEEZY_PRO_MONTHLY_VARIANT_ID: "pro",
+            self.LEMON_SQUEEZY_PRO_YEARLY_VARIANT_ID: "pro",
+            self.LEMON_SQUEEZY_TEAM_MONTHLY_VARIANT_ID: "team",
+            self.LEMON_SQUEEZY_TEAM_YEARLY_VARIANT_ID: "team",
+            self.LEMON_SQUEEZY_ENTERPRISE_MONTHLY_VARIANT_ID: "enterprise",
+            self.LEMON_SQUEEZY_ENTERPRISE_YEARLY_VARIANT_ID: "enterprise",
+        }
+    
     class Config:
         env_prefix = "LEMON_SQUEEZY_"
 

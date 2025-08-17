@@ -43,14 +43,20 @@ def verify_stripe_signature(payload: bytes, signature: str, secret: str) -> bool
 
 
 def verify_lemonsqueezy_signature(payload: bytes, signature: str, secret: str) -> bool:
-    """Verify Lemon Squeezy webhook signature."""
+    """Verify Lemon Squeezy webhook signature using HMAC-SHA256."""
     try:
+        # Lemon Squeezy uses HMAC-SHA256 with the webhook secret
         expected_signature = hmac.new(
             secret.encode('utf-8'),
             payload,
             hashlib.sha256
         ).hexdigest()
-        return hmac.compare_digest(signature, expected_signature)
+        
+        # Lemon Squeezy signature format: "sha256=<signature>"
+        expected_header = f"sha256={expected_signature}"
+        
+        # Use constant-time comparison to prevent timing attacks
+        return hmac.compare_digest(expected_header, signature)
     except Exception as e:
         logger.error(f"Lemon Squeezy signature verification failed: {e}")
         return False
@@ -251,29 +257,59 @@ async def stripe_webhook(request: Request):
 
 
 @router.post("/lemonsqueezy")
-async def lemonsqueezy_webhook(request: Request, sub_service: SubscriptionService = Depends(get_subscription_service)):
-    """Handle Lemon Squeezy webhooks."""
+async def lemonsqueezy_webhook(
+    request: Request, 
+    sub_service: SubscriptionService = Depends(get_subscription_service)
+):
+    """Handle Lemon Squeezy webhooks with HMAC signature verification."""
     try:
-        # Get raw body
+        # Get raw body for signature verification
         body = await request.body()
-        signature = request.headers.get("x-signature", "")
         
-        # Verify signature
-        if not verify_lemonsqueezy_signature(body, signature, settings.LEMON_SQUEEZY_WEBHOOK_SECRET):
-            raise HTTPException(status_code=400, detail="Invalid signature")
+        # Get signature from headers (Lemon Squeezy uses x-signature)
+        signature = request.headers.get("x-signature")
+        if not signature:
+            logger.error("Lemon Squeezy webhook: Missing x-signature header")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing signature")
         
-        # Parse event
-        import json
-        event_data = json.loads(body)
+        # Verify HMAC signature
+        webhook_secret = settings.SUBSCRIPTION.LEMON_SQUEEZY.LEMON_SQUEEZY_WEBHOOK_SECRET.get_secret_value()
+        if not verify_lemonsqueezy_signature(body, signature, webhook_secret):
+            logger.error("Lemon Squeezy webhook: Invalid HMAC signature")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
+        
+        # Parse event data
+        event_data = await request.json()
+        event_id = event_data.get("id")
+        event_name = event_data.get("event_name", "unknown")
+        
+        logger.info(f"Processing Lemon Squeezy webhook: {event_name} (ID: {event_id})")
+        
+        # Check idempotency
+        if await sub_service.is_webhook_event_processed(event_id):
+            logger.info(f"Lemon Squeezy webhook event {event_id} already processed")
+            return JSONResponse(content={"status": "already_processed"})
         
         # Process event
         result = await handle_lemonsqueezy_webhook(event_data, sub_service)
         
+        # Mark as processed
+        await sub_service.mark_webhook_event_processed(
+            event_id, 
+            PaymentProvider.LEMON_SQUEEZY, 
+            event_name
+        )
+        
+        logger.info(f"Successfully processed Lemon Squeezy webhook: {event_name}")
         return JSONResponse(content=result)
         
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
         logger.error(f"Lemon Squeezy webhook error: {e}")
-        raise HTTPException(status_code=400, detail="Webhook processing failed")
+        # Always return 200 to Lemon Squeezy to prevent retries
+        return JSONResponse(content={"status": "error", "message": "Internal processing error"})
 
 
 @router.post("/paddle")
