@@ -12,6 +12,9 @@ from typing import Dict, Any
 from fastapi import APIRouter, Request, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from ....models.subscription import (
     PaymentProvider, 
@@ -24,6 +27,9 @@ from ....config import settings
 from ....core.services.subscription_service import get_subscription_service, SubscriptionService
 
 logger = logging.getLogger(__name__)
+
+# Rate limiting setup
+limiter = Limiter(key_func=get_remote_address)
 
 # Metrics tracking
 webhook_metrics = {
@@ -271,6 +277,7 @@ async def stripe_webhook(request: Request):
 
 
 @router.post("/lemonsqueezy")
+@limiter.limit("60/minute")
 async def lemonsqueezy_webhook(
     request: Request, 
     sub_service: SubscriptionService = Depends(get_subscription_service)
@@ -377,8 +384,16 @@ async def webhook_health():
 
 
 @router.get("/metrics")
-async def webhook_metrics_endpoint():
-    """Get webhook metrics for monitoring."""
+async def webhook_metrics_endpoint(request: Request):
+    """Get webhook metrics for monitoring (admin only)."""
+    # Check for admin API key
+    api_key = request.headers.get("X-Admin-API-Key")
+    if not api_key or api_key != settings.SUBSCRIPTION.ADMIN_API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Admin API key required"
+        )
+    
     global webhook_metrics
     
     # Calculate success rate

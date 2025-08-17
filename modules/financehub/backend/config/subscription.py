@@ -209,6 +209,12 @@ class SubscriptionSettings(BaseSettings):
         description="Whether subscription system is enabled"
     )
     
+    # Admin API key for metrics endpoint
+    ADMIN_API_KEY: Optional[str] = Field(
+        default=None, 
+        description="Admin API key for metrics access"
+    )
+    
     # Plan limits
     FREE_PLAN_DAILY_REQUESTS: int = Field(
         default=100, 
