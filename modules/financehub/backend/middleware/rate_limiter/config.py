@@ -16,7 +16,7 @@ RATE_LIMIT_RULES: Dict[str, Tuple[int, int]] = {
     "/api/v1/stock/": (100, 60),      # 100 requests per minute
     "/api/v1/macro/": (200, 60),      # 200 requests per minute  
     "/api/v1/auth/": (10, 60),        # 10 requests per minute
-    "/api/v1/chat/": (20, 60),        # 20 requests per minute
+    "/api/v1/stock/chat/": (20, 60),  # 20 requests per minute (align to actual chat path)
     
     # Specific endpoints with stricter limits
     "/api/v1/auth/login": (5, 300),   # 5 attempts per 5 minutes

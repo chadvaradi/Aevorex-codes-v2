@@ -1,0 +1,18 @@
+shared/frontend/src/components/chat/ChatInput.tsx:41:      await fetch('/api/v1/config/model', {
+shared/frontend/src/hooks/ai/useDeepDiveChat.ts:15:    fetch(`/api/v1/stock/chat/${ticker}/deep`, {
+shared/frontend/src/hooks/ai/useModelList.ts:17:    (url) => get(url),
+shared/frontend/src/hooks/macro/forex/useForexPair.ts:3:const fetcher = (url: string) => fetch(url).then((res) => res.json());
+shared/frontend/src/hooks/macro/useECBSts.ts:3:const fetcher = (url: string) => fetch(url).then(res => res.json());
+shared/frontend/src/hooks/macro/useECBYieldCurveHistory.ts:3:const fetcher = (url: string) => fetch(url).then((r) => r.json());
+shared/frontend/src/hooks/macro/useHistoricalYieldCurve.ts:19:    (url) => get(url),
+shared/frontend/src/hooks/macro/useMacroRates.ts:28:    (url) => get(url),
+shared/frontend/src/hooks/stock/llm/useLLMStream.ts:63:      const response = await fetch(`/api/v1/stock/chat/${ticker}/stream`, {
+shared/frontend/src/hooks/stock/ui/useChartData.ts:27:    (url) => get(url),
+shared/frontend/src/hooks/stock/ui/useFundamentals.ts:14:    (url) => get(url),
+shared/frontend/src/hooks/stock/ui/useMarketNews.ts:25:    (url) => get(url),
+shared/frontend/src/hooks/stock/ui/useNews.ts:36:    (url) => get(url),
+shared/frontend/src/hooks/stock/ui/useSummary.ts:20:    (url) => get(url),
+shared/frontend/src/hooks/stock/ui/useTechnicalAnalysis.ts:28:        (url) => get(url),
+shared/frontend/src/hooks/system/useMetrics.ts:24:    (url) => fetch(url).then((r) => r.text()).then(parsePrometheus),
+shared/frontend/src/lib/api.ts:36:      const response = await fetch(`${this.baseURL}/api/v1/health`, {
+shared/frontend/src/lib/api.ts:88:        const response = await fetch(url, config);

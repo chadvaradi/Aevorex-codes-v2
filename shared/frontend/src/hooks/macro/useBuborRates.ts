@@ -56,10 +56,15 @@ const transformBuborData = (backendData: BackendBuborResponse): BuborData | null
   };
 };
 
+const fetcher = async (url: string): Promise<BackendBuborResponse> => {
+  const response = await get<BackendBuborResponse>(url);
+  return response.data;
+};
+
 export const useBuborRates = () => {
   const { data, error, isLoading } = useSWR<BackendBuborResponse>(
     '/api/v1/macro/bubor/',
-    get,
+    fetcher,
     { 
       revalidateOnFocus: false,
       revalidateOnReconnect: true,

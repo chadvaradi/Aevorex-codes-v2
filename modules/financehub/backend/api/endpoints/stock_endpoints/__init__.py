@@ -35,7 +35,7 @@ stock_router.include_router(ticker_tape_router)
 
 from fastapi import Request, Query, Depends, status, Path
 import httpx
-from modules.financehub.backend.api.deps import get_http_client, get_cache_service
+from modules.financehub.backend.api.deps import get_http_client, get_cache_service, get_orchestrator
 from modules.financehub.backend.utils.cache_service import CacheService
 from modules.financehub.backend.core.orchestrator.orchestrator import StockOrchestrator
 from modules.financehub.backend.models.stock import FinBotStockResponse
@@ -71,49 +71,30 @@ async def get_ai_summary_alias(
         request=request,
     )
 
-
+# Public doc-friendly alias per rules: /api/v1/stock/{ticker}/ai-analysis
 @stock_router.get(
-    "/{ticker}/technical",
-    summary="[ALIAS] Technical analysis snapshot (legacy path)",
+    "/{ticker}/ai-analysis",
+    summary="AI-generated stock summary",
     status_code=status.HTTP_200_OK,
-    tags=["Technical Analysis"],
-    include_in_schema=False,
+    tags=["AI Analysis"],
 )
-async def get_technical_alias(
+async def get_ai_summary_public(
     ticker: str,
+    request: Request,
     force_refresh: bool = Query(False, description="Force refresh and bypass cache"),
     http_client: httpx.AsyncClient = Depends(get_http_client),
     cache: CacheService = Depends(get_cache_service),
 ):
-    """Wrapper that delegates to the optimized technical analysis service."""
-    orchestrator = StockOrchestrator(cache=cache)
-    indicators, ohlcv_df = await calculate_technical_analysis(
-        symbol=ticker.upper(),
-        cache=cache,
-        http_client=http_client,
-        orchestrator=orchestrator,
+    return await handle_get_ai_summary(
+        ticker=ticker,
         force_refresh=force_refresh,
-        request_id=f"{ticker}-tech-alias",
+        http_client=http_client,
+        cache=cache,
+        request=request,
     )
 
-    from modules.financehub.backend.core.services.stock.model_builders import (
-        build_technical_analysis_response,
-    )
 
-    return build_technical_analysis_response(
-        symbol=ticker.upper(),
-        technical_indicators=indicators,
-        ohlcv_df=ohlcv_df,
-        request_id=f"{ticker}-tech-alias",
-        processing_time=0.0,
-        cache_hit=False,
-    )
-
-# ---------------------------------------------------------------------------
-# Alias – GET /stock/{ticker}/technical  → premium technical-analysis handler
-# ---------------------------------------------------------------------------
-
-
+# Single legacy alias – delegate to premium technical analysis handler
 @stock_router.get(
     "/{ticker}/technical",
     summary="[ALIAS] Technical analysis snapshot (legacy path)",

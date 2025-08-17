@@ -13,8 +13,16 @@ export const useHeaderLogic = (onDrawerToggle: () => void) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
-  // Mock data - recent tickers
-  const recentTickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'META', 'NFLX'];
+  // Recent tickers pulled from localStorage (persisted by ticker interactions). No mock data.
+  const recentTickers = (() => {
+    try {
+      const raw = localStorage.getItem('recent_tickers');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((t: unknown) => typeof t === 'string') : [];
+    } catch {
+      return [];
+    }
+  })();
   
   const handleTickerSelect = (ticker: string) => {
     setShowTickerDropdown(false);

@@ -37,11 +37,8 @@ async def get_sts_response(
         )
 
         if not sts_data:
-            return _empty_payload(
-                message="No STS data available for the requested period",
-                start_date=start_date,
-                end_date=end_date,
-            )
+            from fastapi import HTTPException
+            raise HTTPException(status_code=503, detail="ECB STS data unavailable")
 
         if indicators:
             requested = [i.strip() for i in indicators.split(",")]
@@ -64,11 +61,13 @@ async def get_sts_response(
             "data": sts_data,
         })
     except ECBAPIError as err:
+        from fastapi import HTTPException
         logger.warning("ECB STS fetch error: %s", err)
-        return _empty_payload(str(err))
+        raise HTTPException(status_code=503, detail=str(err))
     except Exception as exc:  # pragma: no cover
+        from fastapi import HTTPException
         logger.error("Unexpected STS error: %s", exc, exc_info=True)
-        return _empty_payload("Internal error – serving empty data per Rule #008")
+        raise HTTPException(status_code=503, detail="Internal error")
 
 
 def get_indicators_response() -> JSONResponse:

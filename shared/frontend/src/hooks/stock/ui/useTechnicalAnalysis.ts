@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface TechnicalAnalysisResponse {
     recommendation: string; // e.g. "BUY", "SELL", "NEUTRAL"
@@ -25,7 +25,7 @@ export const useTechnicalAnalysis = (
 
     const { data: raw, error, isLoading } = useSWR<RawTechnicalResponse>(
         endpoint,
-        (url) => get(url),
+        (url) => swrFetcher<RawTechnicalResponse>(url),
         {
             revalidateOnFocus: false,
             dedupingInterval: 300000, // 5 min

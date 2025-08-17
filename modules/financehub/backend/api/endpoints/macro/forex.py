@@ -33,7 +33,8 @@ USE_EXR_HOST_FALLBACK = not bool(_ALPHA_API_KEY)
 
 router = APIRouter(prefix="/forex", tags=["Macro - Forex"])
 
-SUPPORTED_CURRENCIES = ["USD", "GBP", "JPY", "CHF"]
+# Extended – include HUF so EUR/HUF működjön a frontend kártyán
+SUPPORTED_CURRENCIES = ["USD", "GBP", "JPY", "CHF", "HUF"]
 
 
 @router.get("/pairs", summary="List supported FX pairs")
@@ -62,7 +63,7 @@ async def get_fx_rate(pair: str) -> Dict[str, Any]:
                 raise HTTPException(status_code=400, detail="Invalid FX pair format. Use EUR/USD or EURUSD.")
 
         if base != "EUR" or quote not in SUPPORTED_CURRENCIES:
-            raise HTTPException(status_code=400, detail="Only EUR base and USD/GBP/JPY/CHF quotes supported.")
+            raise HTTPException(status_code=400, detail=f"Only EUR base and {', '.join(SUPPORTED_CURRENCIES)} quotes supported.")
 
         async with httpx.AsyncClient(timeout=10.0) as client:
             if USE_EXR_HOST_FALLBACK:
@@ -177,7 +178,7 @@ async def fetch_fx_history(pair: str, days: int = 30) -> list[dict]:
 
     base, _, quote = pair.upper().partition("/")
     if base != "EUR" or quote not in SUPPORTED_CURRENCIES:
-        raise HTTPException(status_code=400, detail="Only EUR base and USD/GBP/JPY/CHF quotes supported.")
+        raise HTTPException(status_code=400, detail=f"Only EUR base and {', '.join(SUPPORTED_CURRENCIES)} quotes supported.")
 
     end_date = _dt.date.today()
     start_date = end_date - _dt.timedelta(days=days)

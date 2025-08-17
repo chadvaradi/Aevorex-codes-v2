@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 interface ForexRatesResponse {
   status: string;
@@ -18,7 +18,7 @@ interface ForexRatesResponse {
 export const useFxRates = () => {
   const { data, error, isLoading, mutate } = useSWR<ForexRatesResponse>(
     '/api/v1/macro/ecb/fx',
-    get,
+    (url) => swrFetcher<ForexRatesResponse>(url),
     {
       refreshInterval: 300000, // 5 minutes
       revalidateOnFocus: false,

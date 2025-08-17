@@ -1,0 +1,8 @@
+shared/frontend/src/components/chat/ChatInput.tsx:41:      await fetch('/api/v1/config/model', {
+shared/frontend/src/hooks/auth/useAuth.tsx:30:      const data = await api.get<{ authenticated: boolean; user: User }>('/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:57:      await api.post('/auth/logout', {});
+shared/frontend/src/hooks/macro/__tests__/useForexRates.test.ts:24:const mockGet = vi.mocked(api.get);
+shared/frontend/src/hooks/stock/useLLMStream.ts:63:      const response = await fetch(`/api/v1/stock/chat/${ticker}/stream`, {
+shared/frontend/src/hooks/stock/useSearchData.ts:19:    (url: string) => api.get<SearchResult[]>(url),
+shared/frontend/src/lib/api.ts:29:      const response = await fetch(`${this.baseURL}/api/v1/health`, {
+shared/frontend/src/lib/api.ts:83:        const response = await fetch(url, config);

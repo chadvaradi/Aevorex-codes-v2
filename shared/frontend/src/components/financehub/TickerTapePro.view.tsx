@@ -74,10 +74,10 @@ const TickerTapePro: React.FC<TickerTapeProProps> = ({ className = '', onTickerC
     <>
       <div className={`h-[26px] overflow-hidden bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 ${className}`}
         onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        {/* Desktop: Full marquee */}
-        <div className="hidden md:block h-full">
+        {/* Desktop: Full marquee – 0. pillanattól teljes szélesség */}
+        <div className="hidden md:block h-full overflow-hidden">
           <ul className={`flex items-center h-full whitespace-nowrap will-change-transform ${isPaused ? 'animate-marquee-pause' : 'animate-marquee'}`}
-            style={{ paddingLeft: '100%' }}>
+            style={{ paddingLeft: '100vw' }}>
             {duplicatedTickers.map((ticker, index) => (
               <TickerItem key={`${ticker.symbol}-${index}`} ticker={ticker} onClick={handleTickerClick}
                 formatPrice={formatPrice} formatChangePercent={formatChangePercent} />

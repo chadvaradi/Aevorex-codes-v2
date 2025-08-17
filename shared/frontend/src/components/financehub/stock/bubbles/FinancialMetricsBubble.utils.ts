@@ -1,6 +1,27 @@
-export const formatValue = (value: number | undefined, suffix: string = '', prefix: string = ''): string => {
-    if (value === undefined || value === null) return 'N/A';
-    return `${prefix}${value.toLocaleString()}${suffix}`;
+export const formatValue = (
+  value: number | undefined,
+  suffix: string = '',
+  prefix: string = ''
+): string => {
+  if (value === undefined || value === null || Number.isNaN(value)) return 'N/A';
+  const abs = Math.abs(value);
+  try {
+    // Use compact notation for large numbers to avoid UI overflow/overlap
+    if (abs >= 10_000) {
+      const compact = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 2,
+      }).format(value);
+      return `${prefix}${compact}${suffix}`;
+    }
+    // For smaller numeric ratios use up to 3 fraction digits
+    const normal = new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 3,
+    }).format(value);
+    return `${prefix}${normal}${suffix}`;
+  } catch {
+    return `${prefix}${value}${suffix}`;
+  }
 };
 
 export const formatPercentage = (value: number | undefined): string => {

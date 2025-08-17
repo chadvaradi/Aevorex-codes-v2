@@ -4,15 +4,34 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aevorex FinanceHub</title>
+    <title>AEVOREX — Enterprise Intelligence Platform</title>
+    <meta name="description" content="Integrált AI platform pénzügyi kutatáshoz és vállalati döntéstámogatáshoz. Finance, Health, Content és AI — egy rendszerben.">
     
     <!-- Performance hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="//localhost:8084">
+    <!-- Typography: Space Grotesk (sans), Newsreader (serif display) -->
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Prefer IPv4 loopback to reduce Safari "Load failed" on ::1 -->
+    <link rel="dns-prefetch" href="//127.0.0.1:8084">
+
+    <!-- GIS client for Google Sign-In (id: google.accounts.id) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:title" content="AEVOREX — Enterprise Intelligence Platform">
+    <meta property="og:description" content="Integrált AI platform pénzügyi kutatáshoz és vállalati döntéstámogatáshoz.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://localhost:8083/">
+    <meta property="og:image" content="/assets/og/aevorex-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AEVOREX — Enterprise Intelligence Platform">
+    <meta name="twitter:description" content="Integrált AI platform pénzügyi kutatáshoz és vállalati döntéstámogatáshoz.">
+    <meta name="twitter:image" content="/assets/og/aevorex-og.jpg">
   </head>
   <body>
     <div id="root"></div>
+    <!-- Remove global tv.js to avoid clashing with advanced embed widget -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html> 

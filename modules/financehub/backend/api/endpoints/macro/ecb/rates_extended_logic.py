@@ -24,12 +24,18 @@ async def monetary_policy_response(service: MacroDataService) -> Dict[str, Any]:
         start = today - timedelta(days=30)
         rates_data = await service.get_ecb_policy_rates(start, today)
         if not rates_data:
-            logger.warning("ECB policy rates empty – using static fallback")
-            # Static but real latest known rates (source: ECB press release 2025-06-12)
-            rates_data = {
-                "MRO": {str(start): 4.25},
-                "DFR": {str(start): 3.75},
-                "MLFR": {str(start): 4.50},
+            return {
+                "status": "unavailable",
+                "message": "ECB policy rates unavailable for requested period.",
+                "metadata": {
+                    "source": "ECB SDMX (FM dataflow)",
+                    "date_range": {
+                        "start": start.isoformat(),
+                        "end": today.isoformat(),
+                        "period": "30d",
+                    },
+                },
+                "data": {},
             }
 
         current_rates: Dict[str, Dict[str, Any]] = {}
@@ -80,13 +86,18 @@ async def retail_rates_response(
 
         data = await service.get_ecb_retail_rates(start_date, end_date)
         if not data:
-            logger.warning("Retail rates empty – using static fallback")
-            data = {
-                end_date.isoformat(): {
-                    "Household Deposits Overdraft": 0.35,
-                    "Household Loans": 3.56,
-                    "Non-Financial Corp Loans": 4.20,
-                }
+            return {
+                "status": "unavailable",
+                "message": "ECB retail rates unavailable for requested period.",
+                "metadata": {
+                    "source": "ECB SDMX (MIR dataflow)",
+                    "date_range": {
+                        "start": start_date.isoformat(),
+                        "end": end_date.isoformat(),
+                        "period": period or "1y",
+                    },
+                },
+                "data": {},
             }
 
         return {

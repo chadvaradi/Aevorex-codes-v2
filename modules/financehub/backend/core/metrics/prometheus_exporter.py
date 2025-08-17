@@ -84,16 +84,46 @@ class PrometheusExporter:
                 registry=self.registry,
                 buckets=(0.1, 0.2, 0.5, 1, 2, 5, 10, 30),
             )
+            self.macro_fred_request_seconds = Histogram(
+                "fh_macro_fred_request_seconds",
+                "FRED API request duration in seconds",
+                registry=self.registry,
+                buckets=(0.1, 0.2, 0.5, 1, 2, 5, 10, 30),
+            )
+            self.macro_ust_request_seconds = Histogram(
+                "fh_macro_ust_request_seconds",
+                "UST curve request duration in seconds",
+                registry=self.registry,
+                buckets=(0.05, 0.1, 0.2, 0.5, 1, 2, 5),
+            )
             self.macro_bubor_errors_total = Counter(
                 "fh_macro_bubor_errors_total",
                 "Total BUBOR fetch errors",
                 ["error_type"],
                 registry=self.registry,
             )
+            self.macro_fred_errors_total = Counter(
+                "fh_macro_fred_errors_total",
+                "Total FRED fetch errors",
+                ["error_type"],
+                registry=self.registry,
+            )
+            self.macro_ust_errors_total = Counter(
+                "fh_macro_ust_errors_total",
+                "Total UST curve fetch errors",
+                ["error_type"],
+                registry=self.registry,
+            )
+            self.fallback_total = Counter(
+                "fh_fallback_total",
+                "Fallback occurrences by environment and component",
+                ["env", "component"],
+                registry=self.registry,
+            )
         else:
             # Dummy placeholders so calling code won't break
             self.registry = None
-            self.response_time = self.first_token_ms = self.cache_hits = self.cache_misses = self.deep_opt_in = self.rapid_latency_ms = self.macro_ecb_request_seconds = self.macro_bubor_errors_total = _NoOpMetric()
+            self.response_time = self.first_token_ms = self.cache_hits = self.cache_misses = self.deep_opt_in = self.rapid_latency_ms = self.macro_ecb_request_seconds = self.macro_fred_request_seconds = self.macro_ust_request_seconds = self.macro_bubor_errors_total = self.macro_fred_errors_total = self.macro_ust_errors_total = self.fallback_total = _NoOpMetric()
             logger.warning("prometheus_client not installed – metrics disabled")
 
     # ---------------------------------------------------------------------
@@ -123,6 +153,21 @@ class PrometheusExporter:
 
     def inc_bubor_error(self, error_type: str):
         self.macro_bubor_errors_total.labels(error_type=error_type).inc()
+
+    def observe_fred_request(self, seconds: float):
+        self.macro_fred_request_seconds.observe(seconds)
+
+    def inc_fred_error(self, error_type: str):
+        self.macro_fred_errors_total.labels(error_type=error_type).inc()
+
+    def observe_ust_request(self, seconds: float):
+        self.macro_ust_request_seconds.observe(seconds)
+
+    def inc_ust_error(self, error_type: str):
+        self.macro_ust_errors_total.labels(error_type=error_type).inc()
+
+    def inc_fallback(self, env: str, component: str):
+        self.fallback_total.labels(env=env, component=component).inc()
 
     # ------------------------------------------------------------------
     # FastAPI router

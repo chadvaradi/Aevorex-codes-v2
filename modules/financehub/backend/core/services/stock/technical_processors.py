@@ -17,7 +17,18 @@ if not hasattr(_np, "NaN"):
     # Alias added for backward-compatibility with pandas_ta and similar libs
     _np.NaN = _np.nan  # type: ignore[attr-defined]
 
-import pandas_ta as ta
+try:
+    import pandas_ta as ta  # noqa: F401  # optional heavy dependency
+except Exception as import_exc:  # pragma: no cover – optional
+    # Log once and continue; technical indicators will be skipped.
+    import importlib
+    import warnings
+
+    warnings.warn(
+        f"pandas_ta unavailable ({import_exc}); technical indicator features disabled.",
+        RuntimeWarning,
+    )
+    ta = None  # type: ignore[assignment]
 from typing import Any
 
 from modules.financehub.backend.utils.logger_config import get_logger
@@ -41,9 +52,11 @@ class TechnicalProcessor:
             # Create a new DataFrame for indicators to avoid modifying the original
             indicators_df = ohlcv_df.copy()
 
+            if ta is None:
+                logger.warning("pandas_ta not installed – skipping indicator calculation.")
+                return None
+
             # Use the pandas_ta library to apply a strategy
-            # A "strategy" in pandas_ta is just a collection of indicators.
-            # We can define a custom strategy or use a pre-built one.
             custom_strategy = ta.Strategy(
                 name="Aevorex Standard",
                 description="Standard set of indicators for FinBot analysis.",

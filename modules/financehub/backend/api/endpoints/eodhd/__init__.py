@@ -5,6 +5,7 @@ eodhd_router = APIRouter(prefix="/eodhd", tags=["EODHD"], include_in_schema=True
 import os
 import httpx
 import asyncio
+from modules.financehub.backend.config import settings
 
 _EOD_KEY = os.getenv("FINBOT_API_KEYS__EODHD") or os.getenv("EODHD_API_KEY")
 
@@ -17,6 +18,73 @@ _EOD_KEY = os.getenv("FINBOT_API_KEYS__EODHD") or os.getenv("EODHD_API_KEY")
 
 SUPPORTED_DATASETS = {"dividends", "splits", "fundamentals"}
 SUPPORTED_DATASETS.add("overview")
+
+
+@eodhd_router.get("/fx/{pair}", summary="Get real-time FX rate from EODHD (no fallback)")
+async def get_eodhd_fx_pair(pair: str):
+    """Return latest FX quote for a given pair using EODHD real-time API.
+
+    - Expected `pair` formats: `EURHUF`, `EUR/HUF`, `EUR_HUF` (normalized to `EURHUF`).
+    - Only EODHD is used (no fallback) to comply with no-fallback policy.
+    """
+    # Read API key at request time to avoid import-order issues with env loading
+    _key = (
+        os.getenv("FINBOT_API_KEYS__EODHD")
+        or os.getenv("FINBOT_API_KEYS_EODHD")
+        or os.getenv("EODHD_API_KEY")
+        or (settings.API_KEYS.EODHD.get_secret_value() if getattr(settings.API_KEYS, 'EODHD', None) else None)
+    )
+    if not _key:
+        raise HTTPException(status_code=503, detail="EODHD API key not configured")
+
+    normalized = pair.upper().replace("/", "").replace("-", "").replace("_", "")
+    if len(normalized) != 6 or not normalized.startswith("EUR"):
+        raise HTTPException(status_code=400, detail="Invalid FX pair. Use EURXXX format (e.g. EURHUF)")
+
+    symbol = f"{normalized}.FOREX"
+    url = f"https://eodhistoricaldata.com/api/real-time/{symbol}?api_token={_key}&fmt=json"
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+            data = resp.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"EODHD request failed: {exc}")
+
+    # Expected keys: close, timestamp (seconds), change, change_p, code, exchange, ...
+    try:
+        rate_val = float(data.get("close"))
+    except Exception:
+        raise HTTPException(status_code=502, detail="EODHD payload missing 'close' field")
+
+    ts = data.get("timestamp")
+    ts_iso = None
+    try:
+        if ts is not None:
+            import datetime as _dt
+            ts_iso = _dt.datetime.utcfromtimestamp(int(ts)).isoformat() + "Z"
+    except Exception:
+        ts_iso = None
+
+    payload = {
+        "status": "success",
+        "pair": f"EUR/{normalized[3:]}",
+        "rate": rate_val,
+        "timestamp": ts_iso,
+        "source": "EODHD",
+    }
+    if "change" in data:
+        try:
+            payload["change"] = float(data.get("change"))
+        except Exception:
+            pass
+    if "change_p" in data:
+        try:
+            payload["change_p"] = float(data.get("change_p"))
+        except Exception:
+            pass
+
+    return payload
 
 
 @eodhd_router.get("/{ticker}/{dataset}", summary="Proxy EODHD dataset – real provider if key present, fallback yfinance")

@@ -30,7 +30,17 @@
     "vite.config.ts",
     "src/vitest.d.ts",
     "src/components/financehub/stock/AnalysisBubbles/**/*",
-    "src/hooks/stock/**/*"
+    "src/hooks/stock/**/*",
+    "src/hooks/macro/**/*",
+    "src/components/financehub/macro/**/*",
+    "src/components/HeaderPro.logic.ts",
+    "src/components/HeaderPro.logic 2.ts",
+    "src/hooks/auth/**/*"
   ],
-  "exclude": ["node_modules", "dist", "cypress"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "cypress",
+    "src/**/__tests__/**"
+  ]
 } 

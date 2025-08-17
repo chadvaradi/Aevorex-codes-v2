@@ -4,7 +4,6 @@ import { CompanyOverviewBubble } from './CompanyOverview/CompanyOverviewBubble.v
 import { FinancialMetricsBubble } from './FinancialMetrics/FinancialMetricsBubble.view';
 import { NewsHighlightsBubble } from './NewsHighlights/NewsHighlightsBubble.view';
 import { TechnicalAnalysisBubble } from './TechnicalAnalysis/TechnicalAnalysisBubble.view';
-import FundamentalsOverviewCard from '../FundamentalsOverviewCard';
 
 interface AnalysisBubblesGridProps {
   loading: boolean;
@@ -15,17 +14,37 @@ interface AnalysisBubblesGridProps {
 
 const AnalysisBubblesGrid: React.FC<AnalysisBubblesGridProps> = ({ loading, fundamentals, news, ticker }) => {
     if (loading) {
+        // Render skeletons but include headings immediately for premium UX and test stability
         return (
             <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-surface-default p-6 rounded-lg shadow-sm border border-border-default animate-pulse">
-                        <div className="h-6 bg-surface-subtle rounded w-1/3 mb-4"></div>
-                        <div className="space-y-2">
-                            <div className="h-4 bg-surface-subtle rounded w-full"></div>
-                            <div className="h-4 bg-surface-subtle rounded w-5/6"></div>
-                        </div>
+                <div className="bg-surface-default p-6 rounded-lg shadow-sm border border-border-default" aria-busy="true">
+                    <h3 className="text-lg font-semibold text-content-primary mb-2">Company Overview</h3>
+                    <div className="space-y-2 animate-pulse" aria-label="Loading company overview">
+                        <div className="h-4 bg-surface-subtle rounded w-full"></div>
+                        <div className="h-4 bg-surface-subtle rounded w-5/6"></div>
                     </div>
-                ))}
+                </div>
+                <div className="bg-surface-default p-6 rounded-lg shadow-sm border border-border-default" aria-busy="true">
+                    <h3 className="text-lg font-semibold text-content-primary mb-2">Financial Metrics</h3>
+                    <div className="space-y-2 animate-pulse" aria-label="Loading financial metrics">
+                        <div className="h-4 bg-surface-subtle rounded w-full"></div>
+                        <div className="h-4 bg-surface-subtle rounded w-3/4"></div>
+                    </div>
+                </div>
+                <div className="bg-surface-default p-6 rounded-lg shadow-sm border border-border-default" aria-busy="true">
+                    <h3 className="text-lg font-semibold text-content-primary mb-2">News Highlights</h3>
+                    <div className="space-y-2 animate-pulse" aria-label="Loading news highlights">
+                        <div className="h-4 bg-surface-subtle rounded w-full"></div>
+                        <div className="h-4 bg-surface-subtle rounded w-2/3"></div>
+                    </div>
+                </div>
+                <div className="bg-surface-default p-6 rounded-lg shadow-sm border border-border-default" aria-busy="true">
+                    <h3 className="text-lg font-semibold text-content-primary">Technical Analysis</h3>
+                    <div className="mt-2 space-y-2 animate-pulse" aria-label="Loading technical analysis">
+                        <div className="h-4 bg-surface-subtle rounded w-full"></div>
+                        <div className="h-4 bg-surface-subtle rounded w-4/5"></div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -36,7 +55,6 @@ const AnalysisBubblesGrid: React.FC<AnalysisBubblesGridProps> = ({ loading, fund
         <FinancialMetricsBubble fundamentals={fundamentals} />
         <NewsHighlightsBubble news={news} />
         <TechnicalAnalysisBubble ticker={ticker} />
-        <FundamentalsOverviewCard ticker={ticker} />
     </div>
   );
 };

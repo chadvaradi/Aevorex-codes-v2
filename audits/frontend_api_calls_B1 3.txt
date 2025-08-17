@@ -1,0 +1,5 @@
+shared/frontend/src/hooks/auth/useAuth.tsx:33:        const response = await fetch('/api/v1/auth/status');
+shared/frontend/src/hooks/auth/useAuth.tsx:57:        await fetch('/api/v1/auth/logout');
+shared/frontend/src/hooks/stock/useSearchData.ts:31:      const response = await fetch(`/api/v1/stock/search?q=${encodeURIComponent(query)}&limit=10`);
+shared/frontend/src/hooks/stock/useStockPageData.ts:101:                // A toast hibaüzenetet már az `api.ts` kezeli.
+shared/frontend/src/hooks/stock/useTickerTapeData.ts:25:        // A hibakezelést és a toast üzeneteket már az `api.ts` `get` funkciója kezeli.

@@ -33,7 +33,12 @@ export const NewsHighlightsBubble: React.FC<NewsHighlightsBubbleProps> = ({ news
                         const isNew = hoursAgo < 24;
                         return (
                             <li key={index} className="text-sm text-content-secondary flex items-start gap-2" role="listitem">
-                                <span className="truncate flex-1" aria-label={article.title}>{article.title}</span>
+                                <span className="truncate flex-1" aria-label={article.title}>
+                                    {article.title}
+                                    {article.source && (
+                                        <span className="ml-2 text-xxs uppercase tracking-wide text-content-tertiary">{article.source}</span>
+                                    )}
+                                </span>
                                 {isNew && (
                                     <span className="shrink-0 px-2 py-0.5 text-xs font-semibold rounded-full bg-info-600/10 text-info-600" aria-label="New article">NEW</span>
                                 )}
@@ -44,11 +49,15 @@ export const NewsHighlightsBubble: React.FC<NewsHighlightsBubbleProps> = ({ news
             ) : (
                 <p className="text-sm text-content-tertiary">No news highlights available.</p>
             )}
-            {news && news.length > 0 && (
-                <p className="mt-3 text-xs text-content-tertiary" aria-label="Relative time information">
-                     Updated {new Date(news[0].published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                </p>
-            )}
+            {news && news.length > 0 && (() => {
+                const firstDate = Date.parse(news[0].published_at);
+                if (!Number.isFinite(firstDate)) return null;
+                return (
+                    <p className="mt-3 text-xs text-content-tertiary" aria-label="Relative time information">
+                        Updated {new Date(firstDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </p>
+                );
+            })()}
         </div>
     );
 }; 

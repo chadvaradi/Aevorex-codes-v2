@@ -27,37 +27,13 @@ async def get_bls(
 ):
     try:
         data = await _svc(cache).get_ecb_bls(start, end)
-    except AttributeError:
-        # Service method not yet implemented – fall back immediately
-        logger.warning("BLS service method missing – switching to static snapshot fallback")
+    except AttributeError as exc:
+        logger.error("BLS service method missing: %s", exc)
         data = None
 
     if not data:
-        # Static snapshot (Q2-2025 EU aggregates)
-        snapshot = {
-            "lending_conditions_households": {
-                "2025Q2": {
-                    "easing_index": -3,
-                    "demand_index": 2,
-                }
-            },
-            "lending_conditions_corporates": {
-                "2025Q2": {
-                    "easing_index": -5,
-                    "demand_index": -1,
-                }
-            },
-        }
-        return {
-            "status": "success",
-            "count": sum(len(v) for v in snapshot.values()),
-            "data": snapshot,
-            "metadata": {
-                "source": "ECB SDMX (BLS dataflow)",
-                "snapshot": True,
-                "note": "Static fallback – update via scheduled ETL",
-            },
-        }
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ECB BLS data unavailable")
 
     return {
         "status": "success",

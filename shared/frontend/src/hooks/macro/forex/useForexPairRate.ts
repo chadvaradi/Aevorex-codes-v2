@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface ForexPairRateResponse {
   status: string;
@@ -11,7 +11,7 @@ export interface ForexPairRateResponse {
 
 export const useForexPairRate = (pair: string | null) => {
   const endpoint = pair ? `/api/v1/macro/forex/${pair.replace('/', '')}` : null;
-  const { data, error, isLoading, mutate } = useSWR<ForexPairRateResponse>(endpoint, get, {
+  const { data, error, isLoading, mutate } = useSWR<ForexPairRateResponse>(endpoint, (url) => swrFetcher<ForexPairRateResponse>(url), {
     refreshInterval: 60_000,
     revalidateOnFocus: false,
   });

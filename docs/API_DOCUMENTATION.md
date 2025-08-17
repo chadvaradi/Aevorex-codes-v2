@@ -392,10 +392,10 @@ sequenceDiagram
 | GET | `/` | modules/financehub/backend/app_factory.py | `NOT_USED` |
 | GET | `/api/v1/ai/models` | modules/financehub/backend/api/endpoints/ai/models.py | `NOT_USED` |
 | GET | `/api/v1/ai/models/` | modules/financehub/backend/api/endpoints/ai/models.py | `NOT_USED` |
-| GET | `/api/v1/auth/callback` | modules/financehub/backend/api/endpoints/auth/__init__.py | `NOT_USED` |
-| GET | `/api/v1/auth/login` | modules/financehub/backend/api/endpoints/auth/__init__.py | `NOT_USED` |
-| POST | `/api/v1/auth/logout` | modules/financehub/backend/api/endpoints/auth/__init__.py | `USED` |
-| GET | `/api/v1/auth/status` | modules/financehub/backend/api/endpoints/auth/__init__.py | `NOT_USED` |
+| GET | `/api/v1/auth/callback` | modules/financehub/backend/api/endpoints/auth.py | `NOT_USED` |
+| GET | `/api/v1/auth/login` | modules/financehub/backend/api/endpoints/auth.py | `NOT_USED` |
+| POST | `/api/v1/auth/logout` | modules/financehub/backend/api/endpoints/auth.py | `USED` |
+| GET | `/api/v1/auth/status` | modules/financehub/backend/api/endpoints/auth.py | `NOT_USED` |
 | POST | `/api/v1/config/deep` | modules/financehub/backend/api/endpoints/config/__init__.py | `NOT_USED` |
 | POST | `/api/v1/config/language` | modules/financehub/backend/api/endpoints/config/__init__.py | `NOT_USED` |
 | POST | `/api/v1/config/model` | modules/financehub/backend/api/endpoints/config/__init__.py | `USED` |

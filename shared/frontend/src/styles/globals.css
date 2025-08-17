@@ -5,7 +5,8 @@
 /* CSS Variables */
 :root {
   --header-h: 64px;
-  --sub-header-h: 40px;
+  --sub-header-h: 48px; /* legacy name */
+  --subheader-h: 48px;  /* alias used in components */
   --ticker-h: 32px;
 }
 
@@ -20,9 +21,13 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Space Grotesk', system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.display-serif {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
 }
 
 /* Focus styles */
@@ -50,16 +55,13 @@ body {
 
 /* Marquee animation for TickerTape */
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 .animate-marquee {
   animation: marquee 60s linear infinite;
+  width: max-content; /* biztosan túlnyúl a konténeren */
 }
 
 .animate-marquee:hover {
@@ -337,4 +339,19 @@ button:focus-visible {
       @apply w-7/12;
     }
   }
+} 
+
+/* Skeleton override – hide after 0.2 s when no real data (HTTP 503) */
+@keyframes skeletonFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-pulse {
+  animation: skeletonFadeOut 0.2s ease-in-out forwards;
+}
+
+/* Optional placeholder text styling */
+.no-data-placeholder {
+  @apply text-gray-400 text-sm italic;
 } 

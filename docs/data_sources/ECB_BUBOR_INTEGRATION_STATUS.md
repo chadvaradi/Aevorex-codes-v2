@@ -80,7 +80,7 @@
 ---
 
 ## 3. Ismert limitációk & következő lépések
-1. **ECB policy rates**: időszakos *No 'data' key* parsing error – retry+fallback roadmap.
+1. **ECB policy rates**: időszakos *No 'data' key* parsing error – retry policy, PROD: no fallback (structured N/A).
 2. **Yield Curve**: sorozatok 2–10Y hiányos időszakok → spline-interpoláció tervezett.
 3. **updatedAfter** paraméter teljes körű támogatása minden fetcherben.
 4. **BOP & HICP** high-priority backlog – sprint következő ciklus.
@@ -168,5 +168,5 @@ Példa: `ECB,EXR,1.0` → ügynökség + dataflow + verzió. Egy elem megadása 
 Utolsó frissítés: 2025-07-12 (o3 model RPP+CPP+BLS+SPF+CISS+TRD+PSS+IRS integráció) 
 
 ### 2025-07-12 Hotfix log
-- IRS dataflow: fallback wrapper added, strict-scan ✅
-- Comprehensive endpoint: static snapshot fallback ensures 200 + valid payload under SDMX rate limiting. 
+- IRS dataflow: DEV-only fallback path documented; PROD: disabled (structured N/A).
+- Comprehensive endpoint: PROD-ban nincs statikus snapshot fallback; strukturált N/A kerül vissza SDMX rate limiting esetén.

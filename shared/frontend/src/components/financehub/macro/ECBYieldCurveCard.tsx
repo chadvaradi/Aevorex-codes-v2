@@ -1,72 +1,85 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useECBYieldCurve } from '@/hooks/macro/useECBYieldCurve';
-import { useECBYieldCurveHistory } from '@/hooks/macro/useECBYieldCurveHistory';
+/**
+ * ECB Yield Curve Card with Simple Table + Custom Chart
+ * 
+ * Displays official ECB risk-free Euro area yield curve (spot rates).
+ * Uses ECB SDMX YC dataflow for 1Y-30Y maturities.
+ * Simplified without TradingView charts per user request.
+ */
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui';
-import { createChart, IChartApi, LineData, Time } from 'lightweight-charts';
+import api from '@/lib/api';
 
-const ECBYieldCurveCard: React.FC = () => {
-  const [showHistorical, setShowHistorical] = useState(false);
-  const { curve, date, loading, error, mutate } = useECBYieldCurve();
-  const { data: histData, isLoading: histLoading } = useECBYieldCurveHistory('5y');
-  const effectiveCurve = showHistorical ? histData : curve;
-  const effectiveLoading = showHistorical ? histLoading : loading;
+interface YieldCurveData {
+  [maturity: string]: number;
+}
 
-  const handleRetry = () => {
-    mutate();
-  };
+interface ECBYieldCurveCardProps {
+  className?: string;
+}
 
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
+const ECBYieldCurveCard: React.FC<ECBYieldCurveCardProps> = ({ 
+  className = ""
+}) => {
+  const [yieldData, setYieldData] = useState<YieldCurveData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Setup chart when data available
+  // ECB Yield Curve maturities we want to display
+  const MATURITIES = [
+    { key: '1Y', label: '1Y', years: 1 },
+    { key: '2Y', label: '2Y', years: 2 },
+    { key: '5Y', label: '5Y', years: 5 },
+    { key: '10Y', label: '10Y', years: 10 }
+  ];
+
   useEffect(() => {
-    if (!chartContainerRef.current || effectiveCurve.length === 0) return;
+    const fetchYieldCurve = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Call dedicated backend endpoint: /api/v1/macro/ecb/yield-curve
+        const resp = await api.get<{ yields: Record<string, Record<string, number>> }>(
+          `/api/v1/macro/ecb/yield-curve?period=1m`
+        );
+        const payload = (resp as any)?.data ?? resp;
+        // backend shape: { data: { yields: { '2025-08-05': { '1Y': 2.12, ... } } } }
+        const yieldsByDate = payload?.yields ?? payload?.data?.yields;
+        if (yieldsByDate && typeof yieldsByDate === 'object') {
+          const latestDate = Object.keys(yieldsByDate).sort().pop();
+          const latest = latestDate ? yieldsByDate[latestDate] : null;
+           const combined: Record<string, number | null> = {};
+          if (latest) {
+            for (const { key, label } of MATURITIES) {
+              const val = latest[key];
+              combined[label] = typeof val === 'number' ? val : null;
+            }
+          }
+          setYieldData(combined);
+        } else {
+          setYieldData(null);
+        }
+      } catch (err) {
+        setError('Failed to fetch yield curve data');
+        console.error('Yield curve fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (chartRef.current) {
-      chartRef.current.remove();
-      chartRef.current = null;
-    }
+    fetchYieldCurve();
+    // Refresh every 10 minutes
+    const interval = setInterval(fetchYieldCurve, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-    const chart = createChart(chartContainerRef.current, {
-      height: 220,
-      layout: {
-        textColor: '#333',
-        fontFamily: 'Inter, sans-serif',
-      },
-      grid: {
-        vertLines: { color: 'rgba(197, 203, 206, 0.2)' },
-        horzLines: { color: 'rgba(197, 203, 206, 0.2)' },
-      },
-      rightPriceScale: {
-        visible: false,
-      },
-      leftPriceScale: {
-        visible: true,
-        borderVisible: false,
-      },
-      timeScale: {
-        visible: false,
-      },
-    });
-
-    const lineSeries = chart.addLineSeries({ color: '#2563eb', lineWidth: 2 });
-
-    const lineData: LineData[] = effectiveCurve.map((p: any, idx: number) => ({
-      time: idx as unknown as Time,
-      value: p.rate,
-    }));
-
-    lineSeries.setData(lineData);
-    chartRef.current = chart;
-  }, [effectiveCurve]);
-
-  if (effectiveLoading) {
+  if (loading) {
     return (
-      <Card>
+      <Card className={className}>
         <CardHeader>
-          <CardTitle>ECB Yield Curve</CardTitle>
+          <CardTitle>Euro Area Yield Curve</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -84,55 +97,81 @@ const ECBYieldCurveCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card>
+      <Card className={className}>
         <CardHeader>
-          <CardTitle>ECB Yield Curve</CardTitle>
+          <CardTitle>Euro Area Yield Curve</CardTitle>
         </CardHeader>
         <CardContent>
-          <ErrorState message="Failed to load yield curve data." retryFn={handleRetry} />
+          <ErrorState
+            message={error || "Failed to load yield curve"}
+          />
         </CardContent>
       </Card>
     );
   }
 
+  // Table-only – chart removed per user request
+
+  // compute derived slopes if data available
+  const slope2s10s = yieldData && yieldData['2Y'] != null && yieldData['10Y'] != null
+    ? ((yieldData['10Y'] as number) - (yieldData['2Y'] as number))
+    : null;
+  // 30Y removed from table; skip 10s30s slope
+
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-2">
-        <div className="flex items-center justify-between w-full">
-          <CardTitle>ECB Yield Curve</CardTitle>
-          <label className="flex items-center gap-2 text-sm">
-            <span>Historical</span>
-            <input type="checkbox" className="toggle toggle-sm" checked={showHistorical} onChange={(e)=>setShowHistorical(e.target.checked)} />
-          </label>
-        </div>
-        {date && !showHistorical && (
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Data as of: {new Date(date).toLocaleDateString()}
-          </p>
-        )}
+    <Card className={`relative ${className}`}>
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">Euro Area Yield Curve</CardTitle>
+        
       </CardHeader>
+      
       <CardContent>
-        {(!effectiveCurve || effectiveCurve.length === 0) ? (
-          <div className="text-center text-sm text-gray-500">
-            No yield curve data available.
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {effectiveCurve.map((point: any, index: number) => (
-              <div key={`${point.tenor}-${index}`} className="flex justify-between items-center py-1">
-                <span className="text-sm font-medium text-gray-600">{point.tenor}</span>
-                <span className="text-sm font-mono text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded">
-                  {point.rate.toFixed(3)}%
-                </span>
-              </div>
-            ))}
-            {/* Chart */}
-            <div ref={chartContainerRef} className="mt-4 w-full h-[220px]" />
+        {/* Yield curve table */}
+        {yieldData && (
+          <div className="overflow-x-auto mb-6">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="text-left py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">Maturity</th>
+                  <th className="text-center py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">Yield</th>
+                  <th className="text-center py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">Years</th>
+                </tr>
+              </thead>
+              <tbody>
+                {MATURITIES.map(({ label, years }) => (
+                  <tr key={label} className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="py-3 px-3 font-medium text-slate-900 dark:text-white">
+                      {label}
+                    </td>
+                    <td className="text-center py-3 px-3 font-mono text-slate-900 dark:text-white">
+                      {yieldData[label] != null ? `${(yieldData[label] as number).toFixed(3)}%` : '—'}
+                    </td>
+                    <td className="text-center py-3 px-3 text-slate-600 dark:text-slate-400">
+                      {years}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
+
+        {/* Derived slopes */}
+        <div className="grid grid-cols-1 gap-3">
+          <div className="p-3 rounded bg-slate-50 dark:bg-slate-800">
+            <div className="text-xs text-slate-600 dark:text-slate-400">2s10s</div>
+            <div className={`text-base font-mono ${slope2s10s != null ? (slope2s10s >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : 'text-slate-500'}`}>
+              {slope2s10s != null ? `${slope2s10s.toFixed(3)}%` : '—'}
+            </div>
+          </div>
+        </div>
+
+        {/* Chart intentionally removed */}
+        
+
       </CardContent>
     </Card>
   );
 };
 
-export default ECBYieldCurveCard; 
+export default ECBYieldCurveCard;

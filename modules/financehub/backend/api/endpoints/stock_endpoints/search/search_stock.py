@@ -4,7 +4,9 @@ Provides search functionality for stock symbols and company names
 """
 
 import logging
-from fastapi import APIRouter, Query
+import os
+import httpx
+from fastapi import APIRouter, Query, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -13,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 # Create router
 router = APIRouter()
+from modules.financehub.backend.api.deps import get_http_client
+from modules.financehub.backend.config import settings
 
 class SearchResult(BaseModel):
     """Single search result"""
@@ -23,39 +27,19 @@ class SearchResult(BaseModel):
 
 class SearchResponse(BaseModel):
     """Search response model"""
+    status: str = Field("success", description="Request status")
     query: str = Field(..., description="Original search query")
-    results: list[SearchResult] = Field(..., description="Search results")
-    total_results: int = Field(..., description="Total number of results")
+    results: list[SearchResult] = Field(default_factory=list, description="Search results")
+    total_results: int = Field(0, description="Total number of results")
     limit: int = Field(..., description="Applied limit")
 
-# Popular stocks database for quick search
-POPULAR_STOCKS = [
-    {"symbol": "AAPL", "name": "Apple Inc.", "exchange": "NASDAQ"},
-    {"symbol": "MSFT", "name": "Microsoft Corporation", "exchange": "NASDAQ"},
-    {"symbol": "GOOGL", "name": "Alphabet Inc.", "exchange": "NASDAQ"},
-    {"symbol": "AMZN", "name": "Amazon.com Inc.", "exchange": "NASDAQ"},
-    {"symbol": "TSLA", "name": "Tesla Inc.", "exchange": "NASDAQ"},
-    {"symbol": "META", "name": "Meta Platforms Inc.", "exchange": "NASDAQ"},
-    {"symbol": "NVDA", "name": "NVIDIA Corporation", "exchange": "NASDAQ"},
-    {"symbol": "NFLX", "name": "Netflix Inc.", "exchange": "NASDAQ"},
-    {"symbol": "AMD", "name": "Advanced Micro Devices Inc.", "exchange": "NASDAQ"},
-    {"symbol": "INTC", "name": "Intel Corporation", "exchange": "NASDAQ"},
-    {"symbol": "CRM", "name": "Salesforce Inc.", "exchange": "NYSE"},
-    {"symbol": "ORCL", "name": "Oracle Corporation", "exchange": "NYSE"},
-    {"symbol": "ADBE", "name": "Adobe Inc.", "exchange": "NASDAQ"},
-    {"symbol": "PYPL", "name": "PayPal Holdings Inc.", "exchange": "NASDAQ"},
-    {"symbol": "DIS", "name": "The Walt Disney Company", "exchange": "NYSE"},
-    {"symbol": "UBER", "name": "Uber Technologies Inc.", "exchange": "NYSE"},
-    {"symbol": "SPOT", "name": "Spotify Technology S.A.", "exchange": "NYSE"},
-    {"symbol": "ZOOM", "name": "Zoom Video Communications Inc.", "exchange": "NASDAQ"},
-    {"symbol": "SQ", "name": "Block Inc.", "exchange": "NYSE"},
-    {"symbol": "SHOP", "name": "Shopify Inc.", "exchange": "NYSE"},
-]
+# Removed static POPULAR_STOCKS to comply with no-mock policy
 
 @router.get("/search", response_model=SearchResponse)
 async def search_stocks(
-    q: str | None = Query(None, description="Search query (symbol or company name)", min_length=0),
-    limit: int = Query(10, description="Maximum number of results", ge=1, le=50)
+    q: str | None = Query(None, description="Search query (symbol or company name)", min_length=1),
+    limit: int = Query(10, description="Maximum number of results", ge=1, le=50),
+    http_client: httpx.AsyncClient = Depends(get_http_client),
 ):
     """
     Search for stocks by symbol or company name
@@ -72,58 +56,49 @@ async def search_stocks(
     """
     try:
         logger.info(f"Stock search request: query='{q}', limit={limit}")
-        
-        # Normalize query for search
-        query_lower = q.lower().strip() if q else ""
-        
-        # Search results
-        results = []
-        
-        # Search by symbol (exact and partial matches)
-        for stock in POPULAR_STOCKS:
-            symbol_lower = stock["symbol"].lower()
-            name_lower = stock["name"].lower()
-            
-            # Exact symbol match (highest priority)
-            if symbol_lower == query_lower:
-                results.insert(0, SearchResult(**stock))
-                continue
-            
-            # Partial symbol match
-            if query_lower and query_lower in symbol_lower:
-                results.append(SearchResult(**stock))
-                continue
-            
-            # Company name match
-            if query_lower and query_lower in name_lower:
-                results.append(SearchResult(**stock))
-        
-        # Remove duplicates while preserving order
-        seen = set()
-        unique_results = []
-        for result in results:
-            if result.symbol not in seen:
-                seen.add(result.symbol)
-                unique_results.append(result)
-        
-        # Apply limit
-        limited_results = unique_results[:limit]
-        
-        response = SearchResponse(
-            query=q if q else "",
-            results=limited_results,
-            total_results=len(unique_results),
-            limit=limit
+        query = (q or "").strip()
+        if not query:
+            return SearchResponse(status="success", query="", results=[], total_results=0, limit=limit)
+
+        # Resolve API key (env or settings)
+        api_key = (
+            os.getenv("FINBOT_API_KEYS__EODHD")
+            or os.getenv("EODHD_API_KEY")
+            or (
+                settings.API_KEYS.EODHD.get_secret_value()
+                if getattr(settings, "API_KEYS", None) and getattr(settings.API_KEYS, "EODHD", None)
+                else None
+            )
         )
-        
-        logger.info(f"Stock search completed: found {len(limited_results)} results for '{q}'")
-        return response
-        
+        if not api_key:
+            logger.warning("EODHD API key missing – returning empty results per no-mock policy")
+            return SearchResponse(status="error", query=query, results=[], total_results=0, limit=limit)
+
+        # EODHD Search API
+        url = f"https://eodhd.com/api/search/{httpx.utils.quote(query)}"
+        params = {"api_token": api_key, "limit": str(limit)}
+        try:
+            resp = await http_client.get(url, params=params, timeout=10.0)
+            resp.raise_for_status()
+            data = resp.json() or []
+            items: list[SearchResult] = []
+            for it in data[:limit]:
+                symbol = it.get("Code") or it.get("Symbol") or ""
+                name = it.get("Name") or ""
+                exchange = it.get("Exchange") or it.get("ExchangeName") or None
+                sec_type = (it.get("Type") or "stock").lower()
+                if symbol and name:
+                    items.append(SearchResult(symbol=symbol, name=name, exchange=exchange, type=sec_type))
+            return SearchResponse(status="success", query=query, results=items, total_results=len(items), limit=limit)
+        except httpx.HTTPError as http_err:
+            logger.error(f"EODHD search HTTP error for '{query}': {http_err}")
+            return SearchResponse(status="error", query=query, results=[], total_results=0, limit=limit)
     except Exception as e:
         logger.error(f"Error in stock search: {e}")
         return JSONResponse(status_code=200, content={
             "status": "error",
             "message": f"Search failed: {str(e)}",
-            "data": [],
-            "metadata": {"query": q, "limit": limit}
-        }) 
+            "results": [],
+            "query": q,
+            "limit": limit
+        })

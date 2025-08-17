@@ -290,7 +290,7 @@ else:
                         return False
                     self._last_ping_time = current_time
                     return True
-            except (ConnectionError, RedisError) as e:
+            except Exception as e:
                 logger.warning(f"[CacheService(Redis)] Connection lost, attempting reconnection: {e}")
                 if not self._reconnecting:
                     await self._reconnect()
@@ -355,7 +355,7 @@ else:
                 result_str: str | None = await self.redis_client.get(key)
                 return result_str
                 
-            except (ConnectionError, RedisError) as e:
+            except Exception as e:
                 logger.error(f"[CacheService(Redis)] [GET:{key}] Connection error: {e}")
                 # Attempt one reconnection
                 try:
@@ -393,7 +393,7 @@ else:
                 await self.redis_client.setex(key, ttl, value_str)
                 return True
                 
-            except (ConnectionError, RedisError) as e:
+            except Exception as e:
                 logger.error(f"[CacheService(Redis)] [SET:{key}] Connection error: {e}")
                 # Attempt one reconnection
                 try:

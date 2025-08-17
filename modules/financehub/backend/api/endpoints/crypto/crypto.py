@@ -46,31 +46,32 @@ async def get_crypto_symbols(cache: Annotated[CacheService, Depends(get_cache_se
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.get(url, params=params)
         if resp.status_code != 200:
-            # ⚠️ CoinGecko may throttle (429) – attempt fallback to CoinPaprika
-            fallback_resp = await client.get("https://api.coinpaprika.com/v1/coins")
-            if fallback_resp.status_code != 200:
-                # Rule #008 – never return status:"error"; serve success wrapper with
-                # empty symbols list so frontend can degrade gracefully.
-                return {
-                    "status": "success",
-                    "symbols": [],
-                    "metadata": {
-                        "fallback": True,
-                        "detail": "Both CoinGecko and CoinPaprika APIs unavailable",
-                        "code": resp.status_code,
-                    },
-                }
-            coins = fallback_resp.json()[:250]
-            symbols = [f"{c['symbol'].upper()}-USD" for c in coins if c.get('symbol')]
-            return {"symbols": symbols}
+            from modules.financehub.backend.config import settings
+            if settings.ENVIRONMENT.NODE_ENV != "production":
+                # Dev fallback to CoinPaprika
+                fallback_resp = await client.get("https://api.coinpaprika.com/v1/coins")
+                if fallback_resp.status_code == 200:
+                    coins = fallback_resp.json()[:250]
+                    symbols = [f"{c['symbol'].upper()}-USD" for c in coins if c.get('symbol')]
+                    return {"symbols": symbols}
+            # Prod: return empty list (graceful N/A)
+            return {
+                "status": "success",
+                "symbols": [],
+                "metadata": {
+                    "fallback": False,
+                    "detail": "Primary provider unavailable",
+                    "code": resp.status_code,
+                },
+            }
 
         data = resp.json()
 
     symbols = [f"{item['symbol'].upper()}-USD" for item in data]
     payload = {"symbols": symbols}
-    # Cache for 1h – enough for frontend selector while keeping it fresh
+    # Cache – tighten to 10 minutes for fresher symbols in PROD policy
     if cache:
-        await cache.set(cache_key, payload, ttl=3600)
+        await cache.set(cache_key, payload, ttl=600)
     return payload
 
 @router.get(
@@ -135,15 +136,21 @@ async def get_crypto_rate(
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(price_url, params=params)
                 if resp.status_code != 200:
-                    # Fallback to CoinPaprika
-                    pp_resp = await client.get(f"https://api.coinpaprika.com/v1/tickers/{coin_id}")
-                    if pp_resp.status_code != 200:
-                        raise HTTPException(status_code=502, detail="Crypto price fetch failed (CoinGecko & CoinPaprika)")
-                    pp_data = pp_resp.json()
-                    usd_price = pp_data.get("quotes", {}).get("USD", {}).get("price")
-                    if usd_price is None:
-                        raise HTTPException(status_code=404, detail="Price data unavailable in CoinPaprika")
-                    prices = {coin_id: {"usd": usd_price}}
+                    from modules.financehub.backend.config import settings
+                    if settings.ENVIRONMENT.NODE_ENV != "production":
+                        # Dev: try CoinPaprika
+                        pp_resp = await client.get(f"https://api.coinpaprika.com/v1/tickers/{coin_id}")
+                        if pp_resp.status_code == 200:
+                            pp_data = pp_resp.json()
+                            usd_price = pp_data.get("quotes", {}).get("USD", {}).get("price")
+                            if usd_price is not None:
+                                prices = {coin_id: {"usd": usd_price}}
+                            else:
+                                raise HTTPException(status_code=404, detail="Price data unavailable in CoinPaprika")
+                        else:
+                            raise HTTPException(status_code=502, detail="Crypto price fetch failed (CoinGecko & CoinPaprika)")
+                    else:
+                        raise HTTPException(status_code=502, detail="Crypto price fetch failed (primary provider)")
                 else:
                     prices = resp.json()
 

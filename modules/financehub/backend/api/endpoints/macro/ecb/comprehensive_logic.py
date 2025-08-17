@@ -95,47 +95,9 @@ async def get_comprehensive_response(
             "metadata": {**payload["meta"], "missing_sections": missing, "source": "ECB SDMX"},
         }
     except Exception as exc:  # pylint: disable=broad-except
-        logger.error("Comprehensive logic error: %s – serving static snapshot fallback", exc, exc_info=True)
-
-        snapshot_end = end_date or date.today()
-        snapshot_start = snapshot_end - timedelta(days=30)
-
-        fallback_payload = {
-            "fx_rates": {
-                "USD": {snapshot_end.isoformat(): 1.09},
-                "GBP": {snapshot_end.isoformat(): 0.85},
-            },
-            "policy_rates": {
-                snapshot_end.isoformat(): {"MRR": 4.25, "DFR": 3.75, "MLFR": 4.50}
-            },
-            "yield_curve": {
-                snapshot_end.isoformat(): {
-                    "1Y": 3.10,
-                    "2Y": 2.95,
-                    "5Y": 2.70,
-                    "10Y": 2.55,
-                }
-            },
-            "monetary_policy_info": {
-                "latest_press_release": {
-                    "date": snapshot_end.isoformat(),
-                    "headline": "ECB keeps key rates unchanged, continues PEPP reinvestments",
-                }
-            },
-        }
-
-        return {
-            "status": "success",
-            "data": fallback_payload,
-            "metadata": {
-                "source": "static-fallback",
-                "note": str(exc),
-                "start": snapshot_start.isoformat(),
-                "end": snapshot_end.isoformat(),
-                "period": period or "snapshot_30d",
-                "missing_sections": list(fallback_payload.keys()),
-            },
-        }
+        from fastapi import HTTPException
+        logger.error("Comprehensive logic error: %s", exc, exc_info=True)
+        raise HTTPException(status_code=503, detail="Comprehensive ECB data unavailable")
 
 async def get_monetary_aggregates_response(
     service: MacroDataService,
@@ -147,11 +109,9 @@ async def get_monetary_aggregates_response(
     start_date, end_date = _resolve_date_range(start_date, end_date, period)
     try:
         aggregates = await service.get_ecb_monetary_aggregates(start_date, end_date)
+        from fastapi import HTTPException
         if not aggregates:
-            logger.warning("Monetary aggregates empty – injecting static fallback")
-            aggregates = {
-                end_date.isoformat(): {"M1": 9861.4, "M2": 15321.9, "M3": 15987.2}
-            }
+            raise HTTPException(status_code=503, detail="ECB monetary aggregates unavailable")
         return {
             "status": "success",
             "data": {"monetary_aggregates": aggregates},
@@ -163,14 +123,9 @@ async def get_monetary_aggregates_response(
             },
         }
     except Exception as exc:  # pylint: disable=broad-except
+        from fastapi import HTTPException
         logger.error("Monetary aggregates logic error: %s", exc)
-        return {
-            "status": "success",
-            "data": {"monetary_aggregates": {
-                end_date.isoformat(): {"M1": 9861.4, "M2": 15321.9, "M3": 15987.2}
-            }},
-            "metadata": {"source": "static-fallback", "error": str(exc)},
-        }
+        raise HTTPException(status_code=503, detail="ECB monetary aggregates unavailable")
 
 async def get_inflation_indicators_response(
     service: MacroDataService,
@@ -182,11 +137,9 @@ async def get_inflation_indicators_response(
     start_date, end_date = _resolve_date_range(start_date, end_date, period)
     try:
         inflation = await service.get_ecb_inflation_indicators(start_date, end_date)
+        from fastapi import HTTPException
         if not inflation:
-            logger.warning("Inflation indicators empty – fallback to sample data")
-            inflation = {
-                end_date.isoformat(): {"HICP": 2.4, "core": 2.1, "energy": -0.5}
-            }
+            raise HTTPException(status_code=503, detail="ECB inflation indicators unavailable")
         return {
             "status": "success",
             "data": {"inflation_indicators": inflation},
@@ -198,11 +151,6 @@ async def get_inflation_indicators_response(
             },
         }
     except Exception as exc:  # pylint: disable=broad-except
+        from fastapi import HTTPException
         logger.error("Inflation indicators logic error: %s", exc)
-        return {
-            "status": "success",
-            "data": {"inflation_indicators": {
-                end_date.isoformat(): {"HICP": 2.4, "core": 2.1, "energy": -0.5}
-            }},
-            "metadata": {"source": "static-fallback", "error": str(exc)},
-        } 
+        raise HTTPException(status_code=503, detail="ECB inflation indicators unavailable") 

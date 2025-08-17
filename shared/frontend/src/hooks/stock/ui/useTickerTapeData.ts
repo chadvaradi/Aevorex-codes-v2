@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 interface TickerTapeItem {
   symbol: string;
@@ -25,20 +25,28 @@ interface TickerTapeAPIResponse {
     last_updated: string;
     cache_hit?: boolean;
   };
+  message?: string;
 }
 
 /**
  * Enhanced ticker tape data hook with color mapping and configuration-driven limits
  */
+const fetcher = async (url: string): Promise<TickerTapeAPIResponse> => {
+  const response = await swrFetcher<TickerTapeAPIResponse>(url);
+  return response as TickerTapeAPIResponse;
+};
+
 export const useTickerTapeData = (limit: number = 20) => {
-  // Always attempt fetch; the API client will retry & surface network errors.
+  const key = `/api/v1/stock/ticker-tape/?limit=${limit}`;
   const { data, error, isLoading, mutate } = useSWR<TickerTapeAPIResponse>(
-    `/api/v1/stock/ticker-tape/?limit=${limit}`,
-    get,
+    key,
+    fetcher,
     {
-      refreshInterval: 30000, // 30s auto refresh
+      refreshInterval: 0,
       revalidateOnFocus: false,
       shouldRetryOnError: false,
+      dedupingInterval: 60_000_000, // gyakorlatilag nincs háttérfrissítés
+      keepPreviousData: true as any,
     }
   );
 
@@ -61,11 +69,13 @@ export const useTickerTapeData = (limit: number = 20) => {
   return {
     tickers: processedTickers,
     loading: isLoading,
-    error: error?.message || null,
+    error: error?.message || (data && data.status !== 'success' ? (data.message || 'Market data unavailable') : null),
     metadata: data?.metadata,
     refresh: mutate,
     totalSymbols: data?.metadata?.total_symbols || 0,
     cacheHit: data?.metadata?.cache_hit || false,
     dataSource: data?.metadata?.data_source || 'unknown',
+    status: data?.status || 'unknown',
+    message: data?.message,
   };
 }; 

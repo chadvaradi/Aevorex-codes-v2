@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '../../lib/api';
+import { swrFetcher } from '../../lib/api';
 
 export type MacroRate = {
   country: string;
@@ -25,7 +25,7 @@ export const useMacroRates = () => {
     isLoading: loading,
   } = useSWR<AllRatesResponse>(
     API_ENDPOINT,
-    (url) => get(url),
+    (url) => swrFetcher<AllRatesResponse>(url),
     {
       // Per demo plan: prevent re-fetch on window focus, set 5 min TTL.
       revalidateOnFocus: false,

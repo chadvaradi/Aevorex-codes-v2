@@ -1,11 +1,20 @@
 from fastapi import APIRouter
 from .endpoints.macro import macro_router
-from .endpoints.stock_endpoints import stock_router
+from .endpoints.tradingview import tradingview_router
+# Stock endpoints currently depend on optional pandas_ta and orchestrator wiring.
+# We guard their import so that missing heavy dependencies do not break overall API startup.
+try:
+    from .endpoints.stock_endpoints import stock_router  # pylint: disable=import-error
+except Exception as e:  # pragma: no cover – optional
+    import logging as _logging
+    _logging.getLogger(__name__).warning("Stock endpoints disabled: %s", e)
+    stock_router = None  # type: ignore
 from .endpoints.config import config_router
 from .endpoints.auth import auth_router
 from .endpoints.crypto import crypto_router
 from .endpoints.market import market_router
 from .endpoints.eodhd import eodhd_router
+from .endpoints.quant import quant_router
 from datetime import datetime
 from fastapi import Request
 
@@ -13,12 +22,16 @@ api_router = APIRouter()
 
 # Always include core FinanceHub routers
 api_router.include_router(macro_router, prefix="/macro", tags=["Macroeconomics"])
-api_router.include_router(stock_router, prefix="/stock", tags=["Stock Data"])
+api_router.include_router(tradingview_router, prefix="", tags=["TradingView UDF"])
+# Include stock router only if successfully imported
+if stock_router is not None:
+    api_router.include_router(stock_router, prefix="/stock", tags=["Stock Data"])
 api_router.include_router(config_router, prefix="", tags=["Config"])
 api_router.include_router(auth_router, prefix="", tags=["Auth"])
 api_router.include_router(crypto_router, prefix="", tags=["Crypto"])
 api_router.include_router(market_router, prefix="", tags=["Market"])
 api_router.include_router(eodhd_router, prefix="", tags=["EODHD"])
+api_router.include_router(quant_router, prefix="/quant", tags=["Quant"])
 
 # Optional AI router – may rely on extra shared modules not available in demo env.
 try:

@@ -82,12 +82,11 @@ async def get_ticker_tape_root(
     Returns real-time ticker data from EODHD API with cache support
     """
     try:
-        logger.info(f"🎯 TickerTape REAL API request (limit={limit}, force_refresh={force_refresh})")
+        logger.info(f"TickerTape API request (limit={limit}, force_refresh={force_refresh})")
         
         # Use centralized provider check logic to validate API key availability
         from modules.financehub.backend.core.ticker_tape_service import get_selected_provider
-        # The provider is chosen dynamically; if no API key is available the helper falls back to the key-less
-        # Yahoo Finance ("YF") data source, guaranteeing non-empty data without violating the no-mock policy.
+        # The provider is chosen dynamically; do not fallback to non-primary providers in enterprise mode.
         selected_provider = get_selected_provider()
         
         # 1. Cache Configuration
@@ -123,7 +122,7 @@ async def get_ticker_tape_root(
                         }
                     )
             except Exception as cache_error:
-                logger.warning(f"⚠️ Cache read error: {cache_error}")
+                logger.warning(f"Cache read error: {cache_error}")
         
         # 3. No cached data or force refresh - fetch fresh data
         logger.info("🔄 Fetching fresh ticker tape data using dedicated service...")
@@ -165,23 +164,12 @@ async def get_ticker_tape_root(
                     }
                 )
             else:
-                logger.warning("Fresh data empty – serving offline snapshot for monitoring continuity")
-                snapshot_items = [
-                    {"symbol": "AAPL", "price": 195.12, "change": -0.23, "percent": -0.12},
-                    {"symbol": "MSFT", "price": 423.45, "change": +1.02, "percent": +0.24},
-                    {"symbol": "NVDA", "price": 123.11, "change": +0.30, "percent": +0.24},
-                ]
-                limited_snapshot = snapshot_items[:limit] if limit < len(snapshot_items) else snapshot_items
+                logger.warning("Fresh ticker data empty – provider returned no items.")
                 return JSONResponse(status_code=status.HTTP_200_OK, content={
-                    "status": "success",
-                    "data": limited_snapshot,
-                    "metadata": {
-                        "total_symbols": len(limited_snapshot),
-                        "requested_limit": limit,
-                        "data_source": "offline_snapshot",
-                        "last_updated": datetime.utcnow().isoformat(),
-                        "cache_hit": False
-                    }
+                    "status": "error",
+                    "message": "Live ticker tape data unavailable",
+                    "provider": selected_provider,
+                    "data": [],
                 })
                 
         except Exception as fresh_cache_error:
@@ -193,9 +181,12 @@ async def get_ticker_tape_root(
                 "data": [],
             })
         
-    except HTTPException:
-        # Re-raise HTTP exceptions (like 503)
-        raise
+    except HTTPException as http_exc:
+        return JSONResponse(status_code=status.HTTP_200_OK, content={
+            "status": "error",
+            "message": str(http_exc.detail) if hasattr(http_exc, "detail") else "Ticker tape error",
+            "data": [],
+        })
     except Exception as e:
         logger.error(f"🚨 Ticker tape endpoint error: {e}")
         raise HTTPException(
@@ -203,7 +194,8 @@ async def get_ticker_tape_root(
             detail=f"Failed to fetch ticker tape data: {str(e)}"
         ) from e
 
-# Alias handler removed – router now handles both variants via redirect_slashes=False
+# Register alias without trailing slash so both `/ticker-tape/` and `/ticker-tape` work
+_register_no_slash_variant(router)
 
 @router.get(
     "/test",
@@ -302,22 +294,11 @@ async def get_ticker_tape_item(
             "data": data,
         })
     except Exception as e:
-        logger.error("Ticker tape item fatal error – serving static fallback: %s", e)
-        fallback_payload = {
-            "symbol": ticker or "AAPL",
-            "price": None,
-            "change": None,
-            "change_percent": None,
-            "volume": None,
-            "currency": "USD",
-            "timestamp": datetime.utcnow().isoformat(),
-        }
+        logger.error("Ticker tape item fatal error: %s", e)
         return JSONResponse(status_code=200, content={
-            "status": "success",
-            "metadata": {
-                "warning": f"Ticker tape fallback due to error: {str(e)}",
-            },
-            "data": fallback_payload,
+            "status": "error",
+            "message": f"Failed to fetch ticker item: {str(e)}",
+            "data": {},
         })
 
 # NOTE: Removed duplicate helper block (caused linter error). The ticker-tape

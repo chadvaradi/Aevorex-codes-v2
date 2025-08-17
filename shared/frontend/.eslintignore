@@ -1,0 +1,22 @@
+# Build artifacts
+storybook-static/
+dist/
+coverage/
+.nyc_output/
+
+# Development files
+*.log
+.vscode/
+.idea/
+
+# Third party libraries
+node_modules/
+
+# Generated files
+*.min.js
+*.bundle.js
+assets/
+
+# Cypress recordings
+cypress/videos/
+cypress/screenshots/ 

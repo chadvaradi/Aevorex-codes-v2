@@ -66,14 +66,9 @@ async def get_ecb_fx_rates_legacy(
         start_date = end_date - timedelta(days=30)
         
         fx_data = await fetch_ecb_fx_rates(cache, currency_pair, start_date, end_date)
-        if (not fx_data) or (isinstance(fx_data, dict) and fx_data.get("status") == "error"):
-            logger.warning("ECB FX legacy endpoint empty – injecting static spot rates fallback")
-            fx_data = {
-                "USD": {end_date.isoformat(): 1.0895},
-                "GBP": {end_date.isoformat(): 0.8482},
-                "JPY": {end_date.isoformat(): 173.41},
-                "CHF": {end_date.isoformat(): 0.9578},
-            }
+        from fastapi import HTTPException
+        if not fx_data or (isinstance(fx_data, dict) and fx_data.get("status") == "error"):
+            raise HTTPException(status_code=503, detail="ECB FX rates unavailable")
 
         response_data = {
             "status": "success",
@@ -107,21 +102,5 @@ async def get_ecb_fx_rates_legacy(
             "message": "ECB FX rates temporarily unavailable – empty dataset returned.",
         })
     except Exception as e:
-        logger.error(f"Error fetching ECB FX rates: {e} – serving static fallback", exc_info=True)
-        end_date = date.today()
-        static_fx = {
-            "USD": {end_date.isoformat(): 1.0895},
-            "GBP": {end_date.isoformat(): 0.8482},
-            "JPY": {end_date.isoformat(): 173.41},
-            "CHF": {end_date.isoformat(): 0.9578},
-        }
-        return JSONResponse(status_code=200, content={
-            "status": "success",
-            "metadata": {
-                "source": "static-fallback (ECB reference)",
-                "date": end_date.isoformat(),
-                "note": str(e),
-            },
-            "data": {"fx_rates": static_fx},
-            "message": "ECB FX rates static fallback provided.",
-        }) 
+        logger.error("Error fetching ECB FX rates: %s", e)
+        raise HTTPException(status_code=503, detail=str(e)) 

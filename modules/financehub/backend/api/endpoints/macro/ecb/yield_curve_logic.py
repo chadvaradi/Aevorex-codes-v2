@@ -17,7 +17,6 @@ logger = get_logger(__name__)
 
 __all__ = [
     "build_yield_curve_response",
-    "build_latest_yield_curve_response",
 ]
 
 # ---------------------------------------------------------------------------
@@ -33,42 +32,8 @@ async def _fetch_ecb(service: MacroDataService, s: date, e: date) -> dict | None
         return None
 
 
-async def _fetch_fed(s: date, e: date) -> dict | None:
-    """Fallback to FRED UST yield-curve if ECB blocks or is empty."""
-    try:
-        from modules.financehub.backend.core.fetchers.macro.fed_yield_curve import (
-            fetch_fed_yield_curve_historical,
-        )
-        import pandas as pd
-        import asyncio as aio
+# Fallback removed – Rule #008: no synthetic or alternate data sources. Only genuine ECB.
 
-        df: pd.DataFrame = await aio.wait_for(fetch_fed_yield_curve_historical(), timeout=8)
-        df = df.loc[s:e]
-        if df.empty:
-            return None
-        out: dict[str, dict[str, float]] = {}
-        for dt, row in df.iterrows():
-            out[str(dt.date())] = {
-                k: float(v) if v == v else None  # NaN → None
-                for k, v in row.to_dict().items()
-            }
-        return out
-    except Exception as exc:  # pragma: no cover
-        logger.warning("FRED fallback failed: %s", exc)
-        return None
-
-
-def _static_snapshot(latest: date) -> dict[str, dict[str, float]]:
-    """Guaranteed real-data snapshot so endpoint never returns error."""
-    curve = {
-        "1Y": 3.82,
-        "2Y": 3.63,
-        "3Y": 3.55,
-        "5Y": 3.41,
-        "7Y": 3.35,
-        "10Y": 3.30,
-    }
-    return {latest.isoformat(): curve}
 
 # ---------------------------------------------------------------------------
 # Public builders ------------------------------------------------------------
@@ -90,20 +55,20 @@ async def build_yield_curve_response(
         start_date = end_date - timedelta(days=365)
 
     data = await _fetch_ecb(service, start_date, end_date)
+    if not data:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="Yield curve data unavailable (ECB unreachable)")
+
     source = "ECB SDMX (YC dataflow)"
 
-    if not data:
-        data = await _fetch_fed(start_date, end_date)
-        source = "FRED UST (fallback)" if data else source
-
-    if not data:
-        data = _static_snapshot(end_date)
-        source = "static-fallback (Euro area)"
-
+    from datetime import datetime as _dt
+    last_updated = _dt.utcnow().isoformat()
     return {
         "status": "success",
         "metadata": {
             "source": source,
+            "unit": "%",
+            "last_updated": last_updated,
             "date_range": {
                 "start": start_date.isoformat(),
                 "end": end_date.isoformat(),
@@ -114,15 +79,4 @@ async def build_yield_curve_response(
     }
 
 
-async def build_latest_yield_curve_response(service: MacroDataService) -> Dict[str, Any]:
-    """Builder for the lightweight `/yield-curve/lite` endpoint."""
-    end_date = date.today()
-    start_date = end_date - timedelta(days=7)
-
-    data = await _fetch_ecb(service, start_date, end_date) or _static_snapshot(end_date)
-
-    return {
-        "status": "success",
-        "metadata": {"source": "ECB SDMX (YC dataflow)", "date": end_date.isoformat()},
-        "data": {"yields": data},
-    } 
+# Deprecated lightweight variant removed – only full builder remains (no fallbacks) 

@@ -14,10 +14,15 @@ interface ComprehensiveDataResponse {
   };
 }
 
+const fetcher = async (url: string): Promise<ComprehensiveDataResponse> => {
+  const response = await get<ComprehensiveDataResponse>(url);
+  return response.data;
+};
+
 export const useECBComprehensiveData = () => {
   const { data, error, isLoading, mutate } = useSWR<ComprehensiveDataResponse>(
     '/api/v1/macro/ecb/comprehensive',
-    get,
+    fetcher,
     {
       refreshInterval: 300000, // 5 minutes
       revalidateOnFocus: false,

@@ -10,10 +10,15 @@ type CryptoRateResponse = {
   rate: number;
 };
 
+const fetcher = async (url: string): Promise<CryptoRateResponse> => {
+  const response = await get<CryptoRateResponse>(url);
+  return response.data;
+};
+
 export const useCryptoRate = (symbol: string | null) => {
   const { data, error, isLoading } = useSWR<CryptoRateResponse>(
     symbol ? `/api/v1/crypto/${symbol}` : null,
-    (url) => get<CryptoRateResponse>(url),
+    fetcher,
     {
       revalidateOnFocus: false,
     }

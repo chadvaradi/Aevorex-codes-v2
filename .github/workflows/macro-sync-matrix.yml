@@ -1,0 +1,69 @@
+name: Macro Sync Matrix Update
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'modules/financehub/backend/**'
+      - 'shared/frontend/src/hooks/macro/**'
+      - 'shared/frontend/src/components/financehub/macro/**'
+      - 'scripts/auto_sync_matrix_generator.py'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'modules/financehub/backend/**'
+      - 'shared/frontend/src/hooks/macro/**'
+      - 'shared/frontend/src/components/financehub/macro/**'
+      - 'scripts/auto_sync_matrix_generator.py'
+
+jobs:
+  update-matrix:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install fastapi uvicorn
+        
+    - name: Run macro sync matrix generator
+      run: |
+        python scripts/auto_sync_matrix_generator.py
+        
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/ENDPOINT_MATRIX.md docs/MACRO_ENDPOINT_SYNC_MATRIX.md
+        git commit -m "🤖 Auto-update macro sync matrix [skip ci]"
+        git push
+        
+    - name: Comment on PR
+      if: github.event_name == 'pull_request' && steps.check_changes.outputs.changes == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🔄 **Macro Sync Matrix Updated**\n\nA macro endpoint szinkronizációs mátrix automatikusan frissítve lett a legfrissebb backend és frontend változások alapján.\n\n📊 **Frissített fájlok:**\n- `docs/ENDPOINT_MATRIX.md`\n- `docs/MACRO_ENDPOINT_SYNC_MATRIX.md`\n\n🔍 **Ellenőrizd:**\n- Backend endpointok megfelelően dokumentálva vannak\n- Frontend hookok és UI komponensek szinkronban vannak\n- Hiányzó integrációk azonosítva lettek'
+          }) 

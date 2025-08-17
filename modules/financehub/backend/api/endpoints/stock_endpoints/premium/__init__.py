@@ -12,7 +12,8 @@ premium_router = APIRouter(prefix="/premium")
 
 # Include premium feature routers
 premium_router.include_router(ai_summary_router)
-premium_router.include_router(technical_analysis_router, prefix="/technical-analysis")
+# Avoid double prefix – router already has prefix "/technical-analysis"
+premium_router.include_router(technical_analysis_router)
 
 # Re-export for main stock_router import
 router = premium_router

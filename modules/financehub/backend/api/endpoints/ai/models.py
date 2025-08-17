@@ -87,52 +87,8 @@ except ModuleNotFoundError as import_err:
         except Exception as fetch_err:
             _logger.error("Failed to fetch model list from OpenRouter – falling back to minimal static list (%s)", fetch_err)
 
-    # If runtime fetch failed or yielded 0 models, fall back to a curated static
-    # list that reflects *real* publicly-available LLM SKUs so the endpoint
-    # remains functional even when the upstream catalogue service is down.
-    # This does not violate the no-mock data rule because the values are real
-    # product identifiers and pricing taken from provider docs (2025-05).
-    if not MODEL_CATALOGUE:
-        _logger.warning("OpenRouter model fetch failed – falling back to static baked-in catalogue.")
-
-        MODEL_CATALOGUE.extend([
-            {
-                "id": "openai/gpt-4o-mini",
-                "ctx": 128000,
-                "price_in": 0.005,
-                "price_out": 0.015,
-                "strength": "balanced",
-                "ux_hint": "chat",
-                "notes": "Fast GPT-4o variant, great default choice."
-            },
-            {
-                "id": "openai/gpt-4o",
-                "ctx": 128000,
-                "price_in": 0.01,
-                "price_out": 0.03,
-                "strength": "advanced",
-                "ux_hint": "chat",
-                "notes": "Latest flagship GPT-4o with multimodal support."
-            },
-            {
-                "id": "anthropic/claude-3-opus",
-                "ctx": 200000,
-                "price_in": 0.015,
-                "price_out": 0.075,
-                "strength": "reasoning",
-                "ux_hint": "analysis",
-                "notes": "Claude-3 Opus – best for deep reasoning tasks."
-            },
-            {
-                "id": "google/gemini-1.5-pro-latest",
-                "ctx": 1000000,
-                "price_in": 0.005,
-                "price_out": 0.015,
-                "strength": "context-window",
-                "ux_hint": "research",
-                "notes": "Gemini 1.5 Pro huge context window (1M tokens)."
-            },
-        ])
+    # No static fallback – if runtime fetch fails, the route will return an
+    # empty list with a structured error payload (no-mock policy).
 
 # ---------------------------------------------------------------------------
 # Pydantic schema

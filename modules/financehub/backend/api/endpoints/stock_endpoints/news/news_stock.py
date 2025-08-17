@@ -62,19 +62,20 @@ async def get_news_stock_data_endpoint(
         )
 
         if not news_items_raw:
-            logger.warning(f"[{request_id}] No news data returned for {symbol} – attempting provider fallback")
-
-            # --- Fallback: try MarketAux rapid news API (free tier) -----------------
-            try:
-                fallback_url = f"https://api.marketaux.com/v1/news/all?symbols={symbol}&filter_entities=true&language=en&api_token=demo"
-                async with httpx.AsyncClient(timeout=10) as fb_client:
-                    fb_resp = await fb_client.get(fallback_url)
-                    if fb_resp.status_code == 200:
-                        fb_json = fb_resp.json()
-                        news_items_raw = fb_json.get("data", [])
-                        logger.info(f"[{request_id}] MarketAux fallback returned {len(news_items_raw)} items for {symbol}")
-            except Exception as fb_err:
-                logger.warning(f"[{request_id}] MarketAux fallback failed: {fb_err}")
+            # No fallback allowed – return structured empty payload
+            return JSONResponse(status_code=status.HTTP_200_OK, content={
+                "status": "error",
+                "message": "News data currently unavailable from providers",
+                "news": [],
+                "sentiment_summary": {},
+                "metadata": {
+                    "symbol": symbol,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "provider": "none",
+                    "cache_hit": False,
+                    "processing_time_ms": round((time.monotonic() - request_start) * 1000, 2)
+                }
+            })
 
         # Still empty after fallback → structured EMPTY payload, no 404
         if not news_items_raw:

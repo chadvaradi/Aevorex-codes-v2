@@ -1,0 +1,394 @@
+./modules/financehub/backend/analysis/models.py:17:@dataclass
+./modules/financehub/backend/analysis/models.py:6:@dataclass
+./modules/financehub/backend/api/__init__.py:34:@api_router.get("/health", tags=["Health"])
+./modules/financehub/backend/api/deps.py:56:@asynccontextmanager
+./modules/financehub/backend/api/endpoints/ai/models.py:153:@functools.lru_cache(maxsize=1)
+./modules/financehub/backend/api/endpoints/ai/models.py:170:@router.get(
+./modules/financehub/backend/api/endpoints/ai/models.py:194:@router.get("", include_in_schema=False)
+./modules/financehub/backend/api/endpoints/auth.py:106:@router.get("/status", tags=["Auth"])
+./modules/financehub/backend/api/endpoints/auth.py:119:@router.api_route("/logout", methods=["GET", "POST"], tags=["Auth"])
+./modules/financehub/backend/api/endpoints/auth.py:133:@router.post("/refresh-token", tags=["Auth"])
+./modules/financehub/backend/api/endpoints/auth.py:34:@router.get("/login", tags=["Auth"])
+./modules/financehub/backend/api/endpoints/auth.py:69:@router.get("/callback", tags=["Auth"])
+./modules/financehub/backend/api/endpoints/auth/__init__.py:15:@auth_router.get("/callback", summary="OAuth2 callback handler")
+./modules/financehub/backend/api/endpoints/auth/__init__.py:23:@auth_router.get("/status", summary="Auth status (mock)")
+./modules/financehub/backend/api/endpoints/auth/__init__.py:29:@auth_router.post("/logout", summary="Logout user", status_code=status.HTTP_204_NO_CONTENT)
+./modules/financehub/backend/api/endpoints/auth/__init__.py:7:@auth_router.get("/login", summary="OAuth2 login redirect")
+./modules/financehub/backend/api/endpoints/config/__init__.py:11:@config_router.post(
+./modules/financehub/backend/api/endpoints/config/__init__.py:31:@config_router.post(
+./modules/financehub/backend/api/endpoints/config/__init__.py:50:@config_router.post(
+./modules/financehub/backend/api/endpoints/crypto/crypto.py:19:@router.get(
+./modules/financehub/backend/api/endpoints/crypto/crypto.py:76:@router.get(
+./modules/financehub/backend/api/endpoints/eodhd/__init__.py:22:@eodhd_router.get("/{ticker}/{dataset}", summary="Proxy EODHD dataset – real provider if key present, fallback yfinance")
+./modules/financehub/backend/api/endpoints/macro/bubor.py:23:@router.get("", summary="Get BUBOR Rates", status_code=status.HTTP_200_OK)
+./modules/financehub/backend/api/endpoints/macro/bubor.py:80:@router.get("/", summary="Get BUBOR Rates (trailing slash alias)", include_in_schema=False, status_code=status.HTTP_200_OK)
+./modules/financehub/backend/api/endpoints/macro/curve.py:20:@curve_router.get(
+./modules/financehub/backend/api/endpoints/macro/ecb/bls.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/bop.py:23:@router.get("/", summary="Get ECB Balance of Payments Data")
+./modules/financehub/backend/api/endpoints/macro/ecb/bop.py:33:@router.get(
+./modules/financehub/backend/api/endpoints/macro/ecb/bop.py:62:@router.get(
+./modules/financehub/backend/api/endpoints/macro/ecb/bsi.py:20:@router.get("/", summary="Get ECB Monetary Aggregates (M1–M3)")
+./modules/financehub/backend/api/endpoints/macro/ecb/cbd.py:23:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/ciss.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/comprehensive.py:24:@comprehensive_router.get("/comprehensive", summary="Get Comprehensive ECB Economic Data")
+./modules/financehub/backend/api/endpoints/macro/ecb/comprehensive.py:35:@comprehensive_router.get("/monetary-aggregates", summary="Get ECB Monetary Aggregates")
+./modules/financehub/backend/api/endpoints/macro/ecb/comprehensive.py:46:@comprehensive_router.get("/inflation", summary="Get ECB Inflation Indicators")
+./modules/financehub/backend/api/endpoints/macro/ecb/cpp.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/estr.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/fx.py:34:@fx_router.get("/fx", summary="Get ECB FX rates for major currencies")
+./modules/financehub/backend/api/endpoints/macro/ecb/fx.py:42:@fx_router.get("/fx/legacy", summary="Get ECB FX Rates (Legacy)")
+./modules/financehub/backend/api/endpoints/macro/ecb/icp.py:17:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/irs.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/ivf.py:23:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/mir.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/pss.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/rates.py:27:@rates_router.get("/rates", summary="Get ECB Short-End Rates (BUBOR parity)")
+./modules/financehub/backend/api/endpoints/macro/ecb/rates.py:37:@rates_router.get("/rates/all", include_in_schema=False)
+./modules/financehub/backend/api/endpoints/macro/ecb/rates.py:47:@rates_router.get("/monetary-policy", summary="Get ECB Monetary Policy Info")
+./modules/financehub/backend/api/endpoints/macro/ecb/rates.py:52:@rates_router.get("/retail-rates", summary="Get ECB Retail Bank Interest Rates")
+./modules/financehub/backend/api/endpoints/macro/ecb/router.py:32:    @cpp_router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/rpp.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/sec.py:24:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/sec.py:57:@router.get(
+./modules/financehub/backend/api/endpoints/macro/ecb/sec.py:75:@router.get(
+./modules/financehub/backend/api/endpoints/macro/ecb/spf.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/sts.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/sts.py:32:@router.get("/indicators")
+./modules/financehub/backend/api/endpoints/macro/ecb/sts.py:37:@router.get("/latest")
+./modules/financehub/backend/api/endpoints/macro/ecb/sts.py:45:@router.get("/health", include_in_schema=False)
+./modules/financehub/backend/api/endpoints/macro/ecb/trd.py:22:@router.get("/")
+./modules/financehub/backend/api/endpoints/macro/ecb/yield_curve.py:29:@yield_curve_router.get("/yield-curve", summary="Get ECB Yield Curve")
+./modules/financehub/backend/api/endpoints/macro/ecb/yield_curve.py:41:@yield_curve_router.get("/yield-curve/lite", summary="Get latest ECB Yield Curve (always-success)")
+./modules/financehub/backend/api/endpoints/macro/ecb/yield_curve.py:48:@yield_curve_router.get("/historical-yield-curve", summary="Get Historical U.S. Treasury Yield Curve")
+./modules/financehub/backend/api/endpoints/macro/forex.py:160:@router.get("/{base}/{quote}", summary="Get FX rate (base & quote segments)")
+./modules/financehub/backend/api/endpoints/macro/forex.py:221:@router.get("/{pair}/history", summary="Get historical FX rate (daily OHLC)")
+./modules/financehub/backend/api/endpoints/macro/forex.py:39:@router.get("/pairs", summary="List supported FX pairs")
+./modules/financehub/backend/api/endpoints/macro/forex.py:45:@router.get("/{pair}", summary="Get FX rate for the given pair (e.g. EURUSD or EUR-USD)")
+./modules/financehub/backend/api/endpoints/market/__init__.py:64:@market_router.get(
+./modules/financehub/backend/api/endpoints/market/__init__.py:6:@market_router.get("/news", summary="Get latest market news", status_code=status.HTTP_200_OK)
+./modules/financehub/backend/api/endpoints/stock_endpoints/__init__.py:49:@stock_router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/__init__.py:73:@stock_router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/chart/chart_data.py:30:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:112:@router.post(
+./modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:29:@router.post(
+./modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:42:@router.get("/{ticker}/stream")
+./modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:91:@router.post("/{ticker}/deep", summary="Stream deep AI analysis for a ticker")
+./modules/financehub/backend/api/endpoints/stock_endpoints/esg/esg_router.py:28:@router.get("/{ticker}", summary="Get ESG score for a stock ticker", include_in_schema=bool(_FMP_KEY))
+./modules/financehub/backend/api/endpoints/stock_endpoints/fundamentals/fundamentals_stock.py:28:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/news/news_stock.py:28:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/router.py:17:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:112:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:142:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:37:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/search/search_stock.py:55:@router.get("/search", response_model=SearchResponse)
+./modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:208:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:217:@router.get(
+./modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:73:@router.get("/", summary="Get ticker-tape data")
+./modules/financehub/backend/api/market_data.py:203:@router.get(
+./modules/financehub/backend/api/market_data.py:50:@router.get(
+./modules/financehub/backend/app_factory.py:136:    @app.get("/", include_in_schema=False)
+./modules/financehub/backend/app_factory.py:140:    @app.get(f"{settings.API_PREFIX}/health", tags=["Health"])
+./modules/financehub/backend/app_factory.py:144:    @app.get("/health", include_in_schema=False)
+./modules/financehub/backend/app_factory.py:196:    # @app.middleware("http")
+./modules/financehub/backend/app_factory.py:214:    @app.exception_handler(Exception)
+./modules/financehub/backend/app_factory.py:34:@asynccontextmanager
+./modules/financehub/backend/celery_app.py:132:        # A futtatandó task azonosítója (a @task dekorátor `name` paramétere VAGY a teljes elérési út)
+./modules/financehub/backend/config/ai.py:28:    @field_validator('PROVIDER')
+./modules/financehub/backend/config/ai.py:29:    @classmethod
+./modules/financehub/backend/config/api_keys.py:20:    @field_validator('*', mode="before")
+./modules/financehub/backend/config/api_keys.py:21:    @classmethod
+./modules/financehub/backend/config/auth.py:29:    # @field_validator("ENABLED")
+./modules/financehub/backend/config/auth.py:30:    # @classmethod
+./modules/financehub/backend/config/cors.py:31:    @model_validator(mode='after')
+./modules/financehub/backend/config/data_processing.py:24:    @field_validator('INDICATOR_PARAMS', mode="before")
+./modules/financehub/backend/config/data_processing.py:25:    @classmethod
+./modules/financehub/backend/config/data_processing.py:34:    @model_validator(mode='after')
+./modules/financehub/backend/config/data_source.py:14:    @field_validator('PRIMARY', 'SECONDARY')
+./modules/financehub/backend/config/data_source.py:15:    @classmethod
+./modules/financehub/backend/config/environment.py:17:    @field_validator('LOG_LEVEL')
+./modules/financehub/backend/config/environment.py:18:    @classmethod
+./modules/financehub/backend/config/environment.py:25:    @model_validator(mode='after')
+./modules/financehub/backend/config/eodhd.py:16:    @model_validator(mode='after')
+./modules/financehub/backend/config/file_processing.py:30:    @model_validator(mode='before')
+./modules/financehub/backend/config/file_processing.py:31:    @classmethod
+./modules/financehub/backend/config/meta.py:16:    @model_validator(mode='after')
+./modules/financehub/backend/config/news.py:22:    @field_validator('ENABLED_SOURCES', 'SOURCE_PRIORITY', mode="before")
+./modules/financehub/backend/config/news.py:23:    @classmethod
+./modules/financehub/backend/config/news.py:27:    @model_validator(mode='after')
+./modules/financehub/backend/config/paths.py:17:    @model_validator(mode='after')
+./modules/financehub/backend/config/redis.py:21:    @property
+./modules/financehub/backend/config/redis.py:25:    @property
+./modules/financehub/backend/config/ticker_tape.py:21:    @field_validator('SYMBOLS', mode="before")
+./modules/financehub/backend/config/ticker_tape.py:22:    @classmethod
+./modules/financehub/backend/config/uvicorn.py:21:    @field_validator('LOG_LEVEL')
+./modules/financehub/backend/config/uvicorn.py:22:    @classmethod
+./modules/financehub/backend/config/uvicorn.py:30:    @model_validator(mode='after')
+./modules/financehub/backend/core/ai_analyzers/models.py:15:@dataclass
+./modules/financehub/backend/core/ai_analyzers/models.py:4:@dataclass
+./modules/financehub/backend/core/fetchers/common/base_fetcher.py:10:    @abstractmethod
+./modules/financehub/backend/core/fetchers/common/base_fetcher.py:17:    @abstractmethod
+./modules/financehub/backend/core/fetchers/common/base_fetcher.py:24:    @abstractmethod
+./modules/financehub/backend/core/fetchers/common/base_fetcher.py:31:    @abstractmethod
+./modules/financehub/backend/core/fetchers/macro/bubor_client.py:85:@retry(
+./modules/financehub/backend/core/fetchers/macro/ecb_client/http_client.py:35:    @retry(
+./modules/financehub/backend/core/mappers/shared/shared_mappers.py:264:                # A NewsItem '@field_validator('published_at', ...)' validátora fogja ezt AwareDatetime-ra alakítani.
+./modules/financehub/backend/core/metrics/prometheus_exporter.py:157:    @router.get("/metrics", summary="Prometheus metrics")
+./modules/financehub/backend/core/metrics/prometheus_exporter.py:22:Ez a fájl kicsi marad (<200 LOC).  @Team: ha bővítitek, inkább osszátok
+./modules/financehub/backend/core/performance/database_pool.py:82:    @asynccontextmanager
+./modules/financehub/backend/core/services/macro/fetch_mixins.py:190:    @staticmethod
+./modules/financehub/backend/core/tasks.py:17:@celery_app.task(name=TASK_NAME, bind=True, max_retries=2, default_retry_delay=30)
+./modules/financehub/backend/models/stock/common.py:29:    @field_validator('symbol', mode='before')
+./modules/financehub/backend/models/stock/common.py:30:    @classmethod
+./modules/financehub/backend/models/stock/common.py:36:    @field_validator('sentiment_label', mode='before')
+./modules/financehub/backend/models/stock/common.py:37:    @classmethod
+./modules/financehub/backend/models/stock/common.py:80:    @field_validator('published_utc', mode='before')
+./modules/financehub/backend/models/stock/common.py:81:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:102:    @field_validator('revenue_actual', 'revenue_estimate', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:103:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:36:    @field_validator('symbol', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:37:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:41:    @field_validator('date', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:42:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:63:    @field_validator('market_cap', 'pe_ratio', 'beta', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:64:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:68:    @field_validator('shares_outstanding', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:69:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:90:    @field_validator('date', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:91:    @classmethod
+./modules/financehub/backend/models/stock/fundamentals.py:97:    @field_validator('eps_actual', 'eps_estimate', mode='before')
+./modules/financehub/backend/models/stock/fundamentals.py:98:    @classmethod
+./modules/financehub/backend/tests/auth/test_auth_flow.py:122:@patch("modules.financehub.backend.api.endpoints.auth.OAuth2Session")
+./modules/financehub/backend/tests/auth/test_auth_flow.py:28:    "email": "test.user@example.com",
+./modules/financehub/backend/tests/auth/test_auth_flow.py:45:@pytest.fixture(scope="module")
+./modules/financehub/backend/tests/auth/test_auth_flow.py:70:@patch("modules.financehub.backend.api.endpoints.auth.OAuth2Session")
+./modules/financehub/backend/tests/crypto/test_crypto_router.py:25:@pytest.fixture(scope="module", autouse=True)
+./modules/financehub/backend/tests/crypto/test_crypto_router.py:55:@patch("modules.financehub.backend.api.endpoints.crypto.crypto.httpx.AsyncClient.get")
+./modules/financehub/backend/tests/crypto/test_crypto_router.py:56:@pytest.mark.asyncio
+./modules/financehub/backend/tests/crypto/test_crypto_router.py:74:@patch("modules.financehub.backend.api.endpoints.crypto.crypto.httpx.AsyncClient.get")
+./modules/financehub/backend/tests/crypto/test_crypto_router.py:75:@pytest.mark.asyncio
+./modules/financehub/backend/tests/eodhd/test_eodhd_endpoint.py:8:@pytest.mark.parametrize("dataset", [
+./modules/financehub/backend/tests/macro/test_forex_endpoint.py:7:@pytest.mark.parametrize("pair", [
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:100:@patch("modules.financehub.backend.core.services.macro_service.MacroDataService.get_bubor_history")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:118:@pytest.mark.skip(reason="Historical FED yield curve redesign in progress – skipping test")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:129:@pytest.mark.skip(reason="/macro/rates/all removed in July-2025 cleanup")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:25:@pytest.fixture(scope="module", autouse=True)
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:46:@patch("modules.financehub.backend.core.services.macro_service.MacroDataService.get_ecb_policy_rates")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:60:@patch("modules.financehub.backend.core.services.macro_service.MacroDataService.get_ecb_policy_rates")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:75:@patch("modules.financehub.backend.core.services.macro_service.MacroDataService.get_ecb_yield_curve")
+./modules/financehub/backend/tests/macro/test_macro_endpoints.py:95:@pytest.mark.skip(reason="Endpoint removed in July-2025 refactor – awaiting replacement")
+./modules/financehub/backend/utils/cache_service.py:141:        @classmethod
+./modules/financehub/backend/utils/cache_service.py:27:        @classmethod
+./modules/financehub/backend/utils/cache_service.py:73:        @property
+Binary file ./modules/financehub/backend/__pycache__/app_factory.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/__pycache__/celery_app.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/analysis/__pycache__/loader.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/analysis/__pycache__/parser.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/analysis/__pycache__/summarizer.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/__pycache__/deps.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/__pycache__/market_data.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/__pycache__/auth.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/ai/__pycache__/models.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/auth/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/config/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/crypto/__pycache__/crypto.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/eodhd/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/bubor.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/curve.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/forex.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/helpers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/__pycache__/rates.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/bop_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/bsi.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/comprehensive.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/comprehensive_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/fx.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/fx_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/ivf.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/models.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/rates_extended_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/rates_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/sec.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/spf.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/sts_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/yield_curve.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/macro/ecb/__pycache__/yield_curve_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/market/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chart/__pycache__/chart_data.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chat/__pycache__/chat_logic.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chat/__pycache__/router.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chat/handlers/__pycache__/compat_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chat/handlers/__pycache__/config_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/chat/handlers/__pycache__/legacy_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/esg/__pycache__/esg_router.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/fundamentals/__pycache__/fundamentals_stock.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/news/__pycache__/news_stock.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/handlers/__pycache__/summary_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/__pycache__/technical_analysis_stock.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/search/__pycache__/search_stock.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/__pycache__/ticker_tape.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/ai.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/api_keys.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/cache.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/cors.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/data_processing.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/data_source.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/env_loader.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/file_processing.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/config/__pycache__/http.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/cache_init.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/constants.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/data_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/file_cache_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/indicator_phase.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/orchestrator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/response_builder.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/tasks.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/__pycache__/ticker_tape_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/__pycache__/unified_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/builder.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/earnings_formatter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/financials_formatter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/indicator_formatter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/news_formatter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai/prompt_generators/__pycache__/price_formatter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai_analyzers/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai_analyzers/__pycache__/fundamental_analyzer.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/ai_analyzers/__pycache__/technical_analyzer.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/chat/prompt_builder/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/alphavantage/__pycache__/alphavantage_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/common/__pycache__/_fetcher_constants.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/eodhd/__pycache__/eodhd_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/fmp/__pycache__/fmp_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/__pycache__/bubor_client.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/__pycache__/ecb_client.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/__pycache__/fed_yield_curve.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/bsi_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/ciss_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/client.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/config.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/exceptions.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/fetchers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/generic_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/hicp_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/http_client.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/irs_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/parsers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/pss_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/macro/ecb_client/__pycache__/trd_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/marketaux/__pycache__/marketaux_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/newsapi/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/newsapi/__pycache__/newsapi_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/fetchers/yfinance/__pycache__/yfinance_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/helpers/__pycache__/conversion.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/helpers/__pycache__/datetime.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/__pycache__/helpers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/__pycache__/service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/calculators/__pycache__/sma.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/calculators/__pycache__/stoch.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/formatters/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/formatters/__pycache__/macd.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/formatters/__pycache__/simple.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/indicator_service/formatters/__pycache__/volume.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/__pycache__/_dynamic_validator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/alphavantage/__pycache__/earnings.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/alphavantage/__pycache__/news.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/chart_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/dividends.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/events_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/helpers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/news.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/news_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/ohlcv_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/price.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/eodhd/__pycache__/splits.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/fmp/__pycache__/news.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/fmp/__pycache__/ratings.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/marketaux/__pycache__/marketaux_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/newsapi/__pycache__/newsapi_mapper.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/shared/__pycache__/shared_mappers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/yfinance/__pycache__/earnings.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/yfinance/__pycache__/financials.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/yfinance/__pycache__/news.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/yfinance/__pycache__/overview.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/mappers/yfinance/__pycache__/price.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/metrics/__pycache__/prometheus_exporter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/orchestrator/__pycache__/orchestrator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/performance/__pycache__/database_pool.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/performance/__pycache__/redis_cluster.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/security/__pycache__/jwt_middleware.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/security/__pycache__/rate_limiter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/cache_manager.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/cache_operations.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/chart_data_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/chart_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/chart_validators.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/chat_data_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/data_processor.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/fundamentals_processors.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/fundamentals_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/news_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/news_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/orchestrator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/response_builder.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/response_helpers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/__pycache__/technical_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/handlers/__pycache__/news_data_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/handlers/__pycache__/ohlcv_data_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/macro/__pycache__/base_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/macro/__pycache__/fetch_mixins.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/macro/__pycache__/macro_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/shared/__pycache__/response_builder.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/shared/__pycache__/response_helpers.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/__init__.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/chart_data_handler.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/chart_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/chart_validators.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/fundamentals_processors.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/fundamentals_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/model_builders.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/news_fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/news_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/orchestrator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/processor.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/response.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/stock/__pycache__/technical_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/ticker/__pycache__/fetcher.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/core/services/ticker/__pycache__/mock_data.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/__pycache__/deprecated_monitor.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/jwt_auth/__pycache__/factory.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/jwt_auth/__pycache__/middleware.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/jwt_auth/__pycache__/token_creator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/jwt_auth/__pycache__/token_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/jwt_auth/__pycache__/token_validator.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/rate_limiter/__pycache__/factory.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/rate_limiter/__pycache__/limiter.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/middleware/rate_limiter/__pycache__/middleware.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/__pycache__/stock_progressive.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/__pycache__/ticker_tape.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/stock/__pycache__/common.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/stock/__pycache__/fundamentals.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/stock/__pycache__/indicator_models.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/stock/__pycache__/price_models.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/models/stock/__pycache__/response_models.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/tests/__pycache__/test_query_classifier.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/auth/__pycache__/test_auth_flow.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/auth/__pycache__/test_auth_flow.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/tests/config/__pycache__/test_paths.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/crypto/__pycache__/test_crypto_router.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/eodhd/__pycache__/test_eodhd_endpoint.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/macro/__pycache__/test_forex_endpoint.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/macro/__pycache__/test_macro_endpoints.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/tests/macro/__pycache__/test_macro_endpoints.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/tests/macro/__pycache__/test_rates_endpoint.cpython-313-pytest-8.4.1.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/cache_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/date_utils.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/helpers_client.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/helpers_parser.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/helpers_service.cpython-313.pyc matches
+Binary file ./modules/financehub/backend/utils/__pycache__/logger_config.cpython-313.pyc matches

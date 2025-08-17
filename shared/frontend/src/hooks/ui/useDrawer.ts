@@ -82,9 +82,9 @@ export const useDrawerProvider = (): DrawerContextType => {
     const pathname = location.pathname;
     let activeModule = null;
     
-    if (pathname.startsWith('/ai')) activeModule = 'AI Hub';
+    if (pathname.startsWith('/ai-hub') || pathname.startsWith('/ai')) activeModule = 'AI Hub';
     else if (pathname.startsWith('/stock') || pathname.startsWith('/macro')) activeModule = 'Finance Hub';
-    else if (pathname.startsWith('/health')) activeModule = 'Health Hub';
+    else if (pathname.startsWith('/healthhub') || pathname.startsWith('/health')) activeModule = 'Health Hub';
     
     setActiveModule(activeModule);
   }, [location.pathname, setActiveModule]);

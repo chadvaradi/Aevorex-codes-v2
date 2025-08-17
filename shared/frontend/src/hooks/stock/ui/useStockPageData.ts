@@ -61,30 +61,58 @@ export const useStockPageData = (ticker: string) => {
           })()
         : undefined;
 
-    const { data: chart, error: chartError, isLoading: chartLoading } = useSWR<ChartResponse>(
+    const chartFetcher = async (url: string): Promise<ChartResponse | undefined> => {
+        const raw: any = await get<any>(url);
+        // Backend returns { status, data: { ohlcv, metadata: { period, interval } } }
+        const ohlcv = raw?.data?.ohlcv ?? raw?.ohlcv ?? [];
+        if (!ohlcv || ohlcv.length === 0) return undefined;
+        const meta = raw?.data?.metadata ?? raw?.metadata ?? {};
+        return {
+            ohlcv,
+            period: meta.period ?? '1y',
+            interval: meta.interval ?? '1d',
+        } as ChartResponse;
+    };
+
+    const { data: chart, error: chartError, isLoading: chartLoading } = useSWR<ChartResponse | undefined>(
         ticker ? `/api/v1/stock/${ticker}/chart` : null,
-        get
+        chartFetcher
     );
 
-    const { data: news, error: newsError, isLoading: newsLoading } = useSWR<{ news: NewsArticle[] }>(
+    const newsFetcher = async (url: string): Promise<NewsArticle[]> => {
+        const raw: any = await get<any>(url);
+        const arr: any[] = raw?.news || raw?.data?.news || [];
+        return arr as NewsArticle[];
+    };
+
+    const { data: news, error: newsError, isLoading: newsLoading } = useSWR<NewsArticle[]>(
         ticker ? `/api/v1/stock/${ticker}/news` : null,
-        get
+        newsFetcher
     );
 
-    const { data: aiSummary, error: summaryError, isLoading: summaryLoading } = useSWR<AiSummary>(
+    const summaryFetcher = async (url: string): Promise<AiSummary> => {
+        const raw: any = await get<any>(url);
+        return {
+            summary: raw?.data?.summary ?? raw?.summary ?? '',
+            sentiment: raw?.data?.sentiment ?? raw?.sentiment ?? 'Neutral',
+        } as AiSummary;
+    };
+
+    const { data: aiSummary, isLoading: summaryLoading } = useSWR<AiSummary>(
         ticker ? `/api/v1/stock/premium/${ticker}/summary` : null,
-        get
+        summaryFetcher
     );
 
     const isLoading = fundamentalsLoading || chartLoading || newsLoading || summaryLoading;
-    const error = fundamentalsError || chartError || newsError || summaryError;
+    // Treat AI summary errors as non-critical; page should render core data even if summary fails
+    const criticalError = fundamentalsError && chartError && newsError ? (fundamentalsError || chartError || newsError) : null;
     
     return {
         fundamentals,
         chart,
-        news: news?.news,
+        news,
         aiSummary,
         isLoading,
-        error: error ? error.message : null,
+        error: criticalError ? (criticalError as any).message : null,
     };
 }; 

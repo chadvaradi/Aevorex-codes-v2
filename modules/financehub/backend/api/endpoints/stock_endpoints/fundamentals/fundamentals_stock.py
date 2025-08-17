@@ -55,18 +55,12 @@ async def get_fundamentals_stock_data_endpoint(
         # Use REAL API service instead of mock data
         orchestrator = StockOrchestrator(cache=cache)
         fundamentals_data = await orchestrator.get_fundamentals_data(symbol, http_client)
-        
+
+        # Contract-first: invalid or unknown ticker → 404 Not Found
+        # This enables FE to render a deterministic error state for invalid symbols
+        from fastapi import HTTPException
         if not fundamentals_data:
-            logger.warning(f"[{request_id}] No fundamentals data for {symbol} – using offline snapshot")
-            try:
-                import json
-                import importlib.resources as pkg_resources
-                snapshot_pkg = "modules.financehub.backend.core.snapshot_fundamentals"
-                with pkg_resources.open_text(snapshot_pkg, f"{symbol}.json") as fp:
-                    fundamentals_data = json.load(fp)
-            except Exception as snap_err:
-                logger.error(f"Snapshot fundamentals load failed: {snap_err}")
-                fundamentals_data = {}
+            raise HTTPException(status_code=404, detail="Symbol not found")
 
         # Continue with response even if fundamentals_data is still empty
         
@@ -100,11 +94,7 @@ async def get_fundamentals_stock_data_endpoint(
         
     except HTTPException as http_exc:
         logger.error(f"[{request_id}] Fundamentals HTTP error: {http_exc.detail}")
-        return JSONResponse(status_code=status.HTTP_200_OK, content={
-            "status": "error",
-            "message": http_exc.detail,
-            "fundamentals": {},
-        })
+        raise
     except Exception as e:
         processing_time = round((time.monotonic() - request_start) * 1000, 2)
         logger.error(f"[{request_id}] fundamentals error after {processing_time}ms: {e}")

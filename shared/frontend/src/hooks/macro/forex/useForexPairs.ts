@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 interface ForexPairsResponse {
   pairs: string[];
@@ -8,7 +8,7 @@ interface ForexPairsResponse {
 export const useForexPairs = () => {
   const { data, error, isLoading, mutate } = useSWR<ForexPairsResponse>(
     '/api/v1/macro/forex/pairs',
-    get,
+    (url) => swrFetcher<ForexPairsResponse>(url),
     {
       revalidateOnFocus: false,
     }

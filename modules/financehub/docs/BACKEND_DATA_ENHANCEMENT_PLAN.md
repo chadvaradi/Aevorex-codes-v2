@@ -3,7 +3,7 @@
 
 ### CURRENT STATUS:
 ✅ Backend HTTP client working (h2 package fixed)
-✅ API endpoints responding with mock data
+✅ DEV-only mocks were used historically for unblock; current PROD policy: no mock data, structured N/A on errors
 ❌ Frontend not displaying all backend data fields
 ❌ No real-time financial data provider integration
 

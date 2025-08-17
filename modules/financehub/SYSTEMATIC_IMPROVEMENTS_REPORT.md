@@ -53,14 +53,14 @@ mapBackendToFrontend(backendResponse, ticker) {
 
 **Hatás:**
 - P/E ratio automatikus számolás valós adatokból
-- Hibakezelés és fallback mechanizmusok
+- Hibakezelés és dev-only fallback mechanizmusok (PROD: structured N/A)
 - Enhanced debugging és logging
 
 ### 2. Financial Metrics Komponens Optimalizálás
 **Fájl:** `static/js/components/analysis-bubbles/financial-metrics/financial-metrics.js`
 
 ```javascript
-// ✅ REAL DATA PROCESSING - NO MOCK FALLBACK
+// ✅ REAL DATA PROCESSING - PROD: NO FALLBACK; DEV-only fallback for debugging
 processFinancialData(fundamentalsData, analyticsData = {}) {
     // Calculate metrics from real backend data
     const calculated_pe_ratio = market_cap / net_income;

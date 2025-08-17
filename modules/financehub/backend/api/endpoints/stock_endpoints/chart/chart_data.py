@@ -29,7 +29,6 @@ router = APIRouter(
 
 @router.get(
     "/{ticker}/chart",
-    response_model=ChartDataResponse,
     summary="Get Chart Data - REAL API (OHLCV ~200ms)",
     description="Returns OHLCV data for charting from real APIs. Optimized for chart rendering.",
     responses={
@@ -59,29 +58,24 @@ async def get_chart_data_endpoint(
     try:
         ohlcv_data, currency, timezone = await fetch_chart_data(symbol, http_client, cache, period, interval)
 
+        # Contract-first: if no OHLCV returned, treat as unknown/invalid symbol
+        if not ohlcv_data:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Symbol not found")
+
         # Unified response structure with REAL chart data
         response_data = {
             "status": "success",
-            "metadata": {
-                "symbol": symbol,
-                "timestamp": datetime.utcnow().isoformat(),
-                "source": "aevorex-real-api",
-                "cache_hit": False,
-                "processing_time_ms": round((time.monotonic() - request_start) * 1000, 2),
-                "data_quality": "real_api_data",
-                "provider": "eodhd_yahoo_hybrid",
-                "version": "3.0.0",
-                "period": period,
-                "interval": interval,
-                "data_points": len(ohlcv_data)
-            },
-            "chart_data": {
-                "symbol": symbol,
+            "data": {
                 "ohlcv": ohlcv_data,
-                "period": period,
-                "interval": interval,
-                "currency": currency,
-                "timezone": timezone
+                "metadata": {
+                    "symbol": symbol,
+                    "interval": interval,
+                    "period": period,
+                    "currency": currency,
+                    "timezone": timezone,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
             }
         }
         
@@ -94,74 +88,27 @@ async def get_chart_data_endpoint(
         )
         
     except HTTPException as http_exc:
-        # Convert provider errors to structured 200 payload
-        logger.warning(f"[{request_id}] Chart data HTTP error – returning static stub: {http_exc.detail}")
-        static_stub = [{
-            "datetime": datetime.utcnow().isoformat(),
-            "open": None,
-            "high": None,
-            "low": None,
-            "close": None,
-            "volume": None,
-        }]
-        return JSONResponse(status_code=status.HTTP_200_OK, content={
-            "status": "success",
-            "metadata": {
-                "symbol": symbol,
-                "timestamp": datetime.utcnow().isoformat(),
-                "warning": http_exc.detail,
-                "source": "static-stub",
-            },
-            "chart_data": {
-                "symbol": symbol,
-                "ohlcv": static_stub,
-                "period": period,
-                "interval": interval
+        # If upstream raised (e.g., invalid ticker), propagate 404 for contract-first behavior
+        if http_exc.status_code == status.HTTP_404_NOT_FOUND:
+            raise
+        # Otherwise return structured error payload (non-404)
+        logger.warning(f"[{request_id}] Chart data HTTP error – returning structured error: {http_exc.detail}")
+        return JSONResponse(status_code=http_exc.status_code, content={
+            "status": "error",
+            "message": http_exc.detail,
+            "data": {
+                "ohlcv": [],
+                "metadata": {
+                    "symbol": symbol,
+                    "interval": interval,
+                    "period": period,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
             }
         })
     except Exception as e:
         processing_time = round((time.monotonic() - request_start) * 1000, 2)
         logger.error(f"[{request_id}] REAL API chart data error after {processing_time}ms: {e}")
-        # Final structured degradation – use last 30 days snapshot from ECB-verified source (real EODHD)
-        logger.warning(f"[{request_id}] No chart data from live providers – serving offline snapshot")
-        try:
-            import pandas as _pd
-            # Minimal CSV snapshot bundled with repo for compliance (real data, not mock)
-            snapshot_path = FilePath(__file__).resolve().parent / "snapshot" / f"{symbol}_30d.csv"
-            if snapshot_path.exists():
-                snap_df = _pd.read_csv(snapshot_path)
-                ohlcv_data = snap_df.to_dict("records")
-            else:
-                ohlcv_data = []
-        except Exception as snap_err:
-            logger.error(f"Snapshot load failed: {snap_err}")
-            ohlcv_data = []
-
-        # Ensure non-empty dataset for strict check compliance
-        if not ohlcv_data:
-            ohlcv_data = [{
-                "datetime": datetime.utcnow().isoformat(),
-                "open": 1.0,
-                "high": 1.0,
-                "low": 1.0,
-                "close": 1.0,
-                "volume": 0,
-            }]
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "metadata": {
-                    "symbol": symbol,
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "message": "offline_snapshot" if ohlcv_data else "Chart data not available",
-                },
-                "chart_data": {
-                    "symbol": symbol,
-                    "ohlcv": ohlcv_data,
-                    "period": period,
-                    "interval": interval,
-                },
-            },
-        )
+        from fastapi import HTTPException
+        logger.warning(f"[{request_id}] No chart data from live providers – raising 503")
+        raise HTTPException(status_code=503, detail="Chart data unavailable")

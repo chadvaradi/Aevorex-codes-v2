@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChatInput } from './ChatInput';
+import { useModelList } from '@/hooks/ai/useModelList';
 import { UserMessage } from './UserMessage';
 import { StreamingMessage } from './StreamingMessage';
 import { AutoScrollIndicator } from './AutoScrollIndicator';
@@ -13,7 +14,8 @@ interface ChatOverlayProps {
 }
 
 export const ChatOverlay: React.FC<ChatOverlayProps> = ({ isOpen, onClose }) => {
-  const { messages, sendMessage, isLoading, ticker, sendDeepAnalysis } = useChatContext();
+  const { messages, sendMessage, isLoading, ticker, sendDeepAnalysis, selectedModelId, setSelectedModelId } = useChatContext();
+  const { models, loading: modelsLoading, error: modelsError } = useModelList();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -79,6 +81,26 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ isOpen, onClose }) => 
 
         {/* Input Panel - sticky bottom, centered, floating glass effect */}
         <div className="sticky bottom-4 w-full px-4 sm:px-6 md:px-8 space-y-3">
+          {/* Model selector */}
+          <div className="w-full sm:w-10/12 md:w-8/12 lg:w-2/3 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between gap-3 text-xs text-neutral-600 dark:text-neutral-300">
+              <label htmlFor="model-select" className="whitespace-nowrap">Model</label>
+              <select
+                id="model-select"
+                className="flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/60 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                disabled={modelsLoading || !!modelsError || (models?.length ?? 0) === 0}
+                value={selectedModelId ?? ''}
+                onChange={(e) => setSelectedModelId(e.target.value || null)}
+              >
+                <option value="">Auto</option>
+                {models.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.id} · {m.strength} · ${'{'}m.price_in{'}'}/{'{'}m.price_out{'}'}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
           {/* Deep-Dive CTA */}
           {ticker && (
             <button

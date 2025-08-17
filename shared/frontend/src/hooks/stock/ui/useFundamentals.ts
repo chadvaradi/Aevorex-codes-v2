@@ -9,9 +9,14 @@ export const useFundamentals = (
   const shouldFetch = ticker && !skip;
   const endpoint = shouldFetch ? `/api/v1/stock/${ticker}/fundamentals` : null;
 
+  const fetcher = async (url: string): Promise<FundamentalsResponse> => {
+    const response = await get<FundamentalsResponse>(url);
+    return response.data;
+  };
+
   const { data, error, isLoading } = useSWR<FundamentalsResponse>(
     endpoint,
-    (url) => get(url),
+    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 600000, // 10 min

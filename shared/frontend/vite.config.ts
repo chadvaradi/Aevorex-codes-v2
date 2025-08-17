@@ -13,7 +13,22 @@ export default defineConfig({
     react({
       plugins: [['@swc/plugin-styled-components', { displayName: true }]],
     }) as any,
+    // Dev-only middleware to avoid 404 for /favicon.ico (browsers request it by default)
+    {
+      name: 'dev-favicon-redirect',
+      configureServer(server) {
+        server.middlewares.use('/favicon.ico', (_req, res) => {
+          res.statusCode = 302;
+          res.setHeader('Location', '/vite.svg');
+          res.end();
+        });
+      },
+    } as any,
   ],
+  esbuild: {
+    // Ideiglenesen relaxed TypeScript checking dev módban
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   resolve: {
     alias: {
       '@shared': path.resolve(__dirname, 'src'),
@@ -22,20 +37,34 @@ export default defineConfig({
   },
   server: {
     port: 8083,
-    host: 'localhost',
+    host: '0.0.0.0',
     strictPort: true,
+    cors: true,
     hmr: {
       port: 8083,
       clientPort: 8083,
     },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8084',
-        changeOrigin: true,
-        secure: false,
-        timeout: 10000,
-      },
-    },
+    proxy: process.env.VITE_API_BASE_URL
+      ? undefined
+      : {
+          '/api': {
+            target: 'http://localhost:8084',
+            changeOrigin: true,
+            secure: false,
+            timeout: 20000,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+          },
+          '/docs': {
+            target: 'http://localhost:8084',
+            changeOrigin: true,
+            secure: false,
+          },
+          '/redoc': {
+            target: 'http://localhost:8084',
+            changeOrigin: true,
+            secure: false,
+          },
+        },
     watch: {
       ignored: [
         '**/storybook-static/**',
@@ -43,6 +72,12 @@ export default defineConfig({
         '**/dist/**',
         '**/.nyc_output/**',
         '**/venv/**',
+        '**/archive_modules/**',
+        '**/logs/**',
+        '**/audits/**',
+        '**/docs/**',
+        '**/shared/frontend/storybook-static/**',
+        '**/shared/frontend/coverage/**',
       ],
     },
     fs: {
@@ -54,7 +89,14 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
+    sourcemap: false,
     chunkSizeWarningLimit: 1000,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
   },
 }); 

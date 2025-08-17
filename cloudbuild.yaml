@@ -1,0 +1,21 @@
+# Cloud Build config to build and push FinanceHub backend image from monorepo root
+# Uses modules/financehub/backend/Dockerfile with repo root as context
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'modules/financehub/backend/Dockerfile'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/aevorex/financehub-backend:dev'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/aevorex/financehub-backend:latest'
+      - '.'
+
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/aevorex/financehub-backend:dev'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/aevorex/financehub-backend:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

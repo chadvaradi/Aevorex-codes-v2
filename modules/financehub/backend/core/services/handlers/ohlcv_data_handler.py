@@ -20,7 +20,7 @@ async def fetch_ohlcv_data(
     cache: CacheService,
     request_id: str
 ) -> list[dict[str, Any]] | None:
-    """Fetch OHLCV data with fallback sources."""
+    """Fetch OHLCV data (dev-only fallback may apply upstream; prod: no fallback)."""
     try:
         yfinance_fetcher = await fetchers.get_fetcher("yfinance", client, cache)
         result = await asyncio.wait_for(

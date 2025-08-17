@@ -222,9 +222,17 @@ async def get_http_client(request: Request) -> httpx.AsyncClient:
     elif _http_client_instance is not None:
         return _http_client_instance
     # ------------------------------------------------------------------
-    # 🛟  Fallback – create a temporary AsyncClient to avoid 503 responses
+    # 🛟  Fallback – DEV only. In production, do NOT create on-the-fly clients.
     # ------------------------------------------------------------------
     try:
+        from modules.financehub.backend.config import settings
+        if settings.ENVIRONMENT.NODE_ENV == "production":
+            from modules.financehub.backend.core.metrics import METRICS_EXPORTER
+            METRICS_EXPORTER.inc_fallback("prod", "http_client")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="HTTP Client unavailable (prod, no fallback)",
+            )
         timeout = httpx.Timeout(
             settings.HTTP_CLIENT.REQUEST_TIMEOUT_SECONDS,
             connect=settings.HTTP_CLIENT.CONNECT_TIMEOUT_SECONDS,
@@ -262,13 +270,18 @@ async def get_cache_service(request: Request) -> CacheService:
     if _cache_service_instance is not None:
         return _cache_service_instance
 
-    # On-the-fly in-memory cache fallback to avoid 503 for non-critical paths
+    # On-the-fly in-memory cache fallback – DEV only. In production: 503.
     try:
+        from modules.financehub.backend.config import settings
+        if settings.ENVIRONMENT.NODE_ENV == "production":
+            from modules.financehub.backend.core.metrics import METRICS_EXPORTER
+            METRICS_EXPORTER.inc_fallback("prod", "cache_service")
+            raise HTTPException(status_code=503, detail="Cache service unavailable (prod, no fallback)")
         from modules.financehub.backend.utils.cache_service import CacheService as _MemCache
         mem_cache = await _MemCache.create()
         request.app.state.cache = mem_cache  # type: ignore[attr-defined]
         _cache_service_instance = mem_cache
-        logger.warning("[Dependency Fallback] Switched to in-memory CacheService fallback.")
+        logger.warning("[Dependency Fallback] Switched to in-memory CacheService fallback (dev).")
         return mem_cache
     except Exception as e:
         logger.critical(f"[Dependency Error] Final cache fallback failed: {e}")
@@ -284,7 +297,7 @@ async def get_orchestrator(request: Request) -> StockOrchestrator:
     elif _orchestrator_instance is not None:
         return _orchestrator_instance
     else:
-        # --- Lazy fallback --------------------------------------------------
+        # --- Lazy fallback (DEV only) --------------------------------------
         # The orchestrator might have been garbage-collected after an automatic
         # code reload (∵ `--reload`) or during a partial startup failure. To
         # avoid surfacing a 503 to the client we instantiate a fresh instance
@@ -292,6 +305,14 @@ async def get_orchestrator(request: Request) -> StockOrchestrator:
         # orchestrator itself is stateless apart from its cache dependency.
 
         try:
+            from modules.financehub.backend.config import settings
+            if settings.ENVIRONMENT.NODE_ENV == "production":
+                from modules.financehub.backend.core.metrics import METRICS_EXPORTER
+                METRICS_EXPORTER.inc_fallback("prod", "orchestrator")
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Orchestrator unavailable (prod, no lazy instantiation)",
+                )
             cache_service = await get_cache_service(request)
             from modules.financehub.backend.core.services.stock.orchestrator import StockOrchestrator  # local import to avoid circulars
 

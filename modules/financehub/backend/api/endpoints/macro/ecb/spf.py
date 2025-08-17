@@ -27,30 +27,13 @@ async def get_spf(
 ):
     try:
         data = await _svc(cache).get_ecb_spf(start, end)
-    except AttributeError:
-        logger.warning("SPF service method missing – fallback to static snapshot")
+    except AttributeError as exc:
+        logger.error("SPF service method missing: %s", exc)
         data = None
 
     if not data:
-        snapshot = {
-            "inflation_expectations": {
-                "2025Q2": 2.1,
-                "2026Q2": 2.0,
-            },
-            "gdp_growth_expectations": {
-                "2025Q2": 1.4,
-                "2026Q2": 1.6,
-            },
-        }
-        return {
-            "status": "success",
-            "count": len(snapshot["inflation_expectations"]) + len(snapshot["gdp_growth_expectations"]),
-            "data": snapshot,
-            "metadata": {
-                "source": "ECB SDMX (SPF dataflow)",
-                "snapshot": True,
-            },
-        }
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ECB SPF data unavailable")
 
     return {
         "status": "success",

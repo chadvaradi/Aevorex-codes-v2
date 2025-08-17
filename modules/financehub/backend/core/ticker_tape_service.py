@@ -108,26 +108,10 @@ class TickerTapeMemoryCache:
 # Global singleton instance
 _memory_cache = TickerTapeMemoryCache()
 
-# The list of tickers to display on the tape - IBKR-grade 29-symbol master list
+# *Lean* 10-symbol list to avoid OOM & delisted tickers
 TICKER_SYMBOLS = [
-    # US Equities - Magnificent 7 + High Volume
-    "NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "TSLA",
-    "BAC", "HOOD", "PLTR", "AMD", "INTC",
-    
-    # Global Index ETFs
-    "SPY", "QQQ", "DIA", "IWM",
-    
-    # Index Futures (cash equivalent)
-    "ES=F", "NQ=F", "YM=F", "RTY=F", "VIX", "DAX", "FTSE",
-    
-    # Forex Majors + 2 Cross
-    "EURUSD=X", "USDJPY=X", "GBPUSD=X", "AUDUSD=X", "USDCAD=X", "USDCHF=X", "EURJPY=X", "GBPJPY=X",
-    
-    # Crypto Market-cap TOP 5 + 2 Narrative
-    "BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "DOGE-USD", "TON-USD",
-    
-    # Commodities (High Macro Correlation)
-    "GC=F", "SI=F", "CL=F", "NG=F"
+    "AAPL", "MSFT", "NVDA", "META", "GOOGL",
+    "AMZN", "BTC-USD", "ETH-USD", "EURUSD=X", "GC=F",
 ]
 
 def _check_api_keys_available(provider: str) -> bool:
@@ -302,6 +286,10 @@ async def update_ticker_tape_data_in_cache(
         s for s in TICKER_SYMBOLS
         if selected_provider != "EODHD" or _is_eodhd_supported(s)
     ]
+
+    # --- Yahoo Finance safeguard ------------------------------------------------
+    if selected_provider == "YF" and len(symbols_iter) > 10:
+        symbols_iter = symbols_iter[:10]
 
     tasks = []
     for symbol in symbols_iter:

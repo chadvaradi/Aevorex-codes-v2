@@ -1,17 +1,26 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'pnpm run dev',
-      startServerReadyPattern: 'ready in',
-      url: ['http://localhost:8083'],
+      // Serve a production preview for SPA routes
+      startServerCommand: 'pnpm run build && pnpm run preview -- --port 8083',
+      startServerReadyPattern: 'Local',
+      url: [
+        'http://localhost:8083/stock/AAPL',
+        'http://localhost:8083/macro',
+        'http://localhost:8083/news',
+        'http://localhost:8083/ai-hub',
+        'http://localhost:8083/content-hub',
+        'http://localhost:8083/healthhub'
+      ],
       numberOfRuns: 3,
       settings: {
         throttlingMethod: 'simulate',
+        preset: 'desktop',
       },
       // Budget JSON ensures bundle does not regress perf
       budgets: [
         {
-          path: '/',
+          path: '/stock/AAPL',
           resourceSizes: [
             { resourceType: 'script', budget: 300 },
             { resourceType: 'total', budget: 1800 },
@@ -21,6 +30,11 @@ module.exports = {
             { metric: 'first-contentful-paint', budget: 2500 },
           ],
         },
+        { path: '/ai-hub' },
+        { path: '/content-hub' },
+        { path: '/macro' },
+        { path: '/news' },
+        { path: '/healthhub' },
       ],
     },
     assert: {

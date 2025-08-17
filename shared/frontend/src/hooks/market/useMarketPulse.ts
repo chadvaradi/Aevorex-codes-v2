@@ -12,10 +12,15 @@ export interface MarketPulseResponse {
   timestamp: string;
 }
 
+const fetcher = async (url: string): Promise<MarketPulseResponse> => {
+  const response = await get<MarketPulseResponse>(url);
+  return response.data;
+};
+
 export const useMarketPulse = () => {
   const { data, error, isLoading } = useSWR<MarketPulseResponse>(
     '/api/v1/market/indices',
-    get,
+    fetcher,
     {
       refreshInterval: 60000, // 1 percenként frissít
       revalidateOnFocus: false,

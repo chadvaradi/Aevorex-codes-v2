@@ -123,3 +123,62 @@ async def get_market_indices(limit: int | None = None):
         )
 
     return {"status": "ok", "count": len(indices), "indices": indices} 
+
+# ---------------------------------------------------------------------------
+# ContentHub support endpoints (no-mock, env-configurable, empty fallback)
+# ---------------------------------------------------------------------------
+
+import os
+import json
+from pathlib import Path
+from typing import Any, cast
+
+
+def _load_json_from_env(env_name: str) -> list[dict[str, Any]]:
+    """Load JSON list from an env var. Supports inline JSON or file path.
+
+    Returns empty list on any error (no mock payloads).
+    """
+    raw = os.getenv(env_name, "").strip()
+    if not raw:
+        return []
+    try:
+        # Inline JSON array or object
+        if raw.startswith("[") or raw.startswith("{"):
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return cast(list[dict[str, Any]], parsed)
+            # If object, wrap into a list for uniformity
+            return [cast(dict[str, Any], parsed)]
+        # Treat as file path
+        p = Path(raw)
+        if p.exists() and p.is_file():
+            text = p.read_text(encoding="utf-8")
+            parsed = json.loads(text)
+            if isinstance(parsed, list):
+                return cast(list[dict[str, Any]], parsed)
+            return [cast(dict[str, Any], parsed)]
+    except Exception:
+        # Silent fallback – return [] to respect no-mock policy
+        return []
+    return []
+
+
+@market_router.get(
+    "/content/studios",
+    summary="List ContentHub studios (env-configurable, empty fallback)",
+    status_code=status.HTTP_200_OK,
+)
+async def list_content_studios():
+    items = _load_json_from_env("FINBOT_CONTENTHUB__STUDIOS_JSON")
+    return {"status": "success", "count": len(items), "studios": items}
+
+
+@market_router.get(
+    "/content/projects",
+    summary="List ContentHub projects (env-configurable, empty fallback)",
+    status_code=status.HTTP_200_OK,
+)
+async def list_content_projects():
+    items = _load_json_from_env("FINBOT_CONTENTHUB__PROJECTS_JSON")
+    return {"status": "success", "count": len(items), "projects": items}

@@ -11,12 +11,6 @@ logger = get_logger(__name__)
 
 __all__ = ["build_fx_response"]
 
-_static_spot = {
-    "USD": 1.0895,
-    "GBP": 0.8482,
-    "JPY": 173.41,
-    "CHF": 0.9578,
-}
 
 async def build_fx_response(
     service: MacroDataService,
@@ -34,11 +28,10 @@ async def build_fx_response(
         logger.warning("ECB FX fetch failed: %s", exc)
         fx_data = None
 
+    from fastapi import HTTPException
     if not fx_data:
-        fx_data = {k: {end_date.isoformat(): v} for k, v in _static_spot.items()}
-        source = "static-fallback (ECB reference)"
-    else:
-        source = "ECB SDMX (EXR dataflow)"
+        raise HTTPException(status_code=503, detail="ECB FX rates unavailable")
+    source = "ECB SDMX (EXR dataflow)"
 
     return {
         "status": "success",

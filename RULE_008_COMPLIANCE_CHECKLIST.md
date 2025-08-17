@@ -16,7 +16,7 @@
 
 ### 2. No Mock Data Policy ✅
 - [x] **Real API Integration:** `ticker_tape_service.py` uses live EODHD/Alphavantage
-- [x] **Fallback Logic:** Multi-provider failover implemented
+- [x] **Fallback Logic:** PROD: no provider fallback; DEV-only fallbacks allowed for debugging. Always return structured N/A.
 - [x] **Cache Strategy:** 30s TTL with stale-while-revalidate
 - [x] **Error Handling:** Graceful degradation for API failures
 

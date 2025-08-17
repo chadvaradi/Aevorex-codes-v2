@@ -22,9 +22,14 @@ export const useChartData = (
     ? `/api/v1/stock/${ticker}/chart?period=${encodeURIComponent(period)}&interval=${encodeURIComponent(interval)}`
     : null;
 
+  const fetcher = async (url: string): Promise<ChartResponse> => {
+    const response = await get<ChartResponse>(url);
+    return response.data;
+  };
+
   const { data, error, isLoading } = useSWR<ChartResponse>(
     endpoint,
-    (url) => get(url),
+    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 300000,

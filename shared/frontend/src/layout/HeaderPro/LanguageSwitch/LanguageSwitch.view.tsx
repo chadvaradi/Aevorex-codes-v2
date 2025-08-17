@@ -8,8 +8,8 @@ const ChevronDownIcon = () => (
 );
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'hu', name: 'Magyar', flag: '🇭🇺' },
+  { code: 'en', name: 'English', abbr: 'EN' },
+  { code: 'hu', name: 'Magyar', abbr: 'HU' },
 ];
 
 export const LanguageSwitch = () => {
@@ -36,9 +36,14 @@ export const LanguageSwitch = () => {
                    hover:text-primary-600 dark:hover:text-primary-400
                    hover:bg-neutral-100 dark:hover:bg-neutral-800
                    rounded-lg transition-smooth"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label="Select language"
       >
-        <span>{currentLanguage.flag}</span>
-        <span>{currentLanguage.code.toUpperCase()}</span>
+        <span className="inline-flex h-5 min-w-[2rem] items-center justify-center rounded-md bg-neutral-100 dark:bg-neutral-800 px-1 text-xs font-semibold">
+          {currentLanguage.abbr}
+        </span>
+        <span className="sr-only">{currentLanguage.name}</span>
         <ChevronDownIcon />
       </button>
 
@@ -51,13 +56,18 @@ export const LanguageSwitch = () => {
           />
           
           {/* Dropdown */}
-          <div className="absolute top-full right-0 mt-1 w-36 z-20
+          <div className="absolute top-full right-0 mt-1 w-40 z-20
                           bg-white dark:bg-neutral-800 
                           border border-neutral-200 dark:border-neutral-700
-                          rounded-lg shadow-lg py-2">
+                           rounded-lg shadow-lg py-2"
+               role="listbox"
+               aria-label="Languages"
+          >
             {languages.map((lang) => (
               <button
                 key={lang.code}
+                role="option"
+                aria-selected={currentLang === lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
                 className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left
                            hover:bg-neutral-50 dark:hover:bg-neutral-700
@@ -67,7 +77,9 @@ export const LanguageSwitch = () => {
                              : 'text-neutral-700 dark:text-neutral-300'
                            }`}
               >
-                <span>{lang.flag}</span>
+                <span className="inline-flex h-5 min-w-[2rem] items-center justify-center rounded-md bg-neutral-100 dark:bg-neutral-700 px-1 text-xs font-semibold">
+                  {lang.abbr}
+                </span>
                 <span>{lang.name}</span>
               </button>
             ))}

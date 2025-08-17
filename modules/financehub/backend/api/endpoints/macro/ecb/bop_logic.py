@@ -10,9 +10,6 @@ from modules.financehub.backend.utils.cache_service import CacheService
 
 logger = get_logger(__name__)
 
-_static_bop = {
-    "2024-Q2": {"Current_Account": 67.3, "Trade_Balance": 52.1, "Services_Balance": 26.4},
-}
 
 __all__ = ["build_bop_response"]
 
@@ -37,9 +34,9 @@ async def build_bop_response(
     data = await _fetch_bop(cache, start_date, end_date)
     source = "ECB SDMX (BOP dataflow)"
 
+    from fastapi import HTTPException
     if not data:
-        data = _static_bop
-        source = "static-fallback (Eurostat public)"
+        raise HTTPException(status_code=503, detail="ECB BOP data unavailable")
 
     # Filter components if requested
     if components:

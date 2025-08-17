@@ -59,18 +59,14 @@ async def handle_get_ai_summary(
             accept_header = request.headers.get("accept", "")
             if "text/event-stream" in accept_header.lower():
                 async def cached_event_generator():
-                    # Simplified streaming from cache
-                    yield f'data: {json.dumps({"content": cached_summary, "type": "token"})}\n\n'
-                    yield "data: [DONE]\n\n"
+                    yield f'data: {json.dumps({"type": "token", "token": cached_summary})}\n\n'
+                    yield f'data: {json.dumps({"type": "end"})}\n\n'
                 return StreamingResponse(cached_event_generator(), media_type="text/event-stream")
-            
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={
-                    "metadata": {"source": "aevorex-ai-cache", "cache_hit": True},
-                    "ai_summary": cached_summary
-                }
-            )
+
+            return JSONResponse(status_code=status.HTTP_200_OK, content={
+                "status": "success",
+                "data": {"summary": cached_summary, "cache_hit": True}
+            })
 
     logger.info(f"[{request_id}] Fetching comprehensive data for AI analysis")
     fundamentals, indicators, news, ohlcv = await orchestrator.fetch_parallel_data(
@@ -162,11 +158,11 @@ async def handle_get_ai_summary(
     accept_header = request.headers.get("accept", "")
     if "text/event-stream" in accept_header.lower():
         async def event_generator():
-            yield f'data: {json.dumps({"content": cleaned_summary, "type": "token"})}\n\n'
-            yield "data: [DONE]\n\n"
+            yield f'data: {json.dumps({"type": "token", "token": cleaned_summary})}\n\n'
+            yield f'data: {json.dumps({"type": "end"})}\n\n'
         return StreamingResponse(event_generator(), media_type="text/event-stream")
 
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"metadata": {"source": "aevorex-ai-live", "cache_hit": False}, "ai_summary": cleaned_summary}
-    ) 
+    return JSONResponse(status_code=status.HTTP_200_OK, content={
+        "status": "success",
+        "data": {"summary": cleaned_summary, "cache_hit": False}
+    })

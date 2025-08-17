@@ -27,30 +27,13 @@ async def get_pss(
 ):
     try:
         data = await _svc(cache).get_ecb_pss(start, end)
-    except AttributeError:
-        logger.warning("PSS service missing – using static snapshot fallback")
+    except AttributeError as exc:
+        logger.error("PSS service method missing: %s", exc)
         data = None
 
     if not data:
-        snapshot = {
-            "payment_volume_mn": {
-                "2025Q1": 58_200_000,
-                "2025Q2": 60_450_000,
-            },
-            "payment_value_eur_bn": {
-                "2025Q1": 275_000,
-                "2025Q2": 289_500,
-            },
-        }
-        return {
-            "status": "success",
-            "count": len(snapshot["payment_volume_mn"]) + len(snapshot["payment_value_eur_bn"]),
-            "data": snapshot,
-            "metadata": {
-                "source": "ECB SDMX (PSS)",
-                "snapshot": True,
-            },
-        }
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ECB PSS data unavailable")
 
     return {
         "status": "success",

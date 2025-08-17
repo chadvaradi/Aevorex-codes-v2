@@ -1,2 +1,0 @@
-path	methods	frontend_used	locations
-/api/v1/health	GET	YES	lib/api.ts

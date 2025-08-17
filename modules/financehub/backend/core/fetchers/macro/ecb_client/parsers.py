@@ -162,13 +162,17 @@ def parse_ecb_yield_curve_json(payload: Dict[str, Any]) -> Dict[str, Dict[str, f
             observations = series_data["observations"]
             
             for obs_key, obs_data in observations.items():
-                if obs_data and obs_data[0] is not None:
-                    # Get date from observation key
+                # ECB 2024+ DSD switched to object form: {"value": 2.34, "flags": [..]}
+                obs_val = None
+                if isinstance(obs_data, list):
+                    obs_val = obs_data[0]
+                elif isinstance(obs_data, dict):
+                    obs_val = obs_data.get("value") or obs_data.get("obs_value")
+
+                if obs_val is not None:
                     date_str = _get_date_from_obs_key(obs_key, structure)
                     if date_str:
-                        if date_str not in result:
-                            result[date_str] = {}
-                        result[date_str][maturity] = float(obs_data[0])
+                        result.setdefault(date_str, {})[maturity] = float(obs_val)
         
         logger.debug(f"Parsed yield curve data for {len(result)} dates")
         return result
@@ -397,10 +401,16 @@ def parse_ecb_sts_json(payload: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
 
             indicator = _determine_sts_indicator(series_key, structure)
             for obs_key, obs_data in series_data["observations"].items():
-                if obs_data and obs_data[0] is not None:
+                obs_val = None
+                if isinstance(obs_data, list):
+                    obs_val = obs_data[0]
+                elif isinstance(obs_data, dict):
+                    obs_val = obs_data.get("value") or obs_data.get("obs_value")
+
+                if obs_val is not None:
                     date_str = _get_date_from_obs_key(obs_key, structure)
                     if date_str:
-                        result.setdefault(date_str, {})[indicator] = float(obs_data[0])
+                        result.setdefault(date_str, {})[indicator] = float(obs_val)
 
         logger.debug("Parsed %s dates / %s indicators from STS payload", len(result), indicator)
         return result

@@ -22,6 +22,7 @@ const LogoutIcon = () => (
 
 export const AvatarMenu = ({ user }: AvatarMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [imageFailed, setImageFailed] = useState<boolean>(false);
   const { logout } = useAuth();
 
   const handleLogout = async () => {
@@ -51,11 +52,15 @@ export const AvatarMenu = ({ user }: AvatarMenuProps) => {
                    hover:bg-neutral-100 dark:hover:bg-neutral-800
                    transition-smooth"
       >
-        {user.picture ? (
+        {user.picture && !imageFailed ? (
           <img
             src={user.picture}
             alt={displayName}
             className="h-8 w-8 rounded-full object-cover ring-2 ring-neutral-200 dark:ring-neutral-700"
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+            loading="eager"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-sm font-medium">
@@ -81,11 +86,15 @@ export const AvatarMenu = ({ user }: AvatarMenuProps) => {
             {/* User Info */}
             <div className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center gap-3">
-                {user.picture ? (
+                {user.picture && !imageFailed ? (
                   <img
                     src={user.picture}
                     alt={displayName}
                     className="h-10 w-10 rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    loading="eager"
+                    onError={() => setImageFailed(true)}
                   />
                 ) : (
                   <div className="h-10 w-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">

@@ -51,18 +51,43 @@ ECB_BOP_DATAFLOW = ECB_DATAFLOWS["BOP"]
 ECB_STS_DATAFLOW = ECB_DATAFLOWS["STS"]
 
 # Policy Rates Series Keys
-KEY_ECB_POLICY_RATES = "B.U2.EUR.4F.KR.MRR_FR.LEV+B.U2.EUR.4F.KR.DFR.LEV+B.U2.EUR.4F.KR.MLFR.LEV"
-KEY_ECB_POLICY_RATES_DAILY = "D.U2.EUR.4F.KR.MRR_FR.LEV+D.U2.EUR.4F.KR.DFR.LEV+D.U2.EUR.4F.KR.MLFR.LEV"
+KEY_ECB_POLICY_RATES = "B.I8.EUR.4F.KR.MRR_FR.LEV+B.I8.EUR.4F.KR.DFR.LEV+B.I8.EUR.4F.KR.MLFR.LEV"
+KEY_ECB_POLICY_RATES_DAILY = "D.I8.EUR.4F.KR.MRR_FR.LEV+D.I8.EUR.4F.KR.DFR.LEV+D.I8.EUR.4F.KR.MLFR.LEV"
 
 INDIVIDUAL_POLICY_SERIES = [
-    "B.U2.EUR.4F.KR.MRR_FR.LEV",  # Main Refinancing Operations
-    "B.U2.EUR.4F.KR.DFR.LEV",     # Deposit Facility Rate
-    "B.U2.EUR.4F.KR.MLFR.LEV"     # Marginal Lending Facility Rate
+    "D.EZB.MRO.LEV",   # Main Refinancing Operations Rate
+    "D.EZB.DFR.LEV",   # Deposit Facility Rate  
+    "D.EZB.MSF.LEV"    # Marginal Lending Facility Rate (Marginal Standing Facility)
 ]
 
 # Yield Curve Series Keys
-# Fixed: added '.A' periodicity segment after SV_C_YM to align with ECB schema
-KEY_ECB_YIELD_CURVE = "B.U2.EUR.4F.G_N_A.SV_C_YM.A.SR_1Y+SR_2Y+SR_3Y+SR_5Y+SR_10Y"
+# Fixed: correct ECB YC dataflow syntax - each maturity as separate series
+# Use new multi-series fetch approach instead of concatenated keys
+KEY_ECB_YIELD_CURVE_MATURITIES = {
+    # Short tenors (kept for completeness, not rendered in UI table)
+    "1M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1M",
+    "3M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_3M", 
+    "6M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_6M",
+    # UI-required core maturities
+    "1Y": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1Y",
+    "2Y": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y",
+    "5Y": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_5Y",
+    "10Y": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+    "30Y": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_30Y",
+}
+
+# Complete fixing rates maturities for comprehensive data
+KEY_ECB_FIXING_RATES_MATURITIES = {
+    "1W": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1W",  # Weekly (if available)
+    "1M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1M",
+    "3M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_3M", 
+    "6M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_6M",
+    "12M": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_1Y"  # 12M = 1Y
+}
+
+# Legacy key for backward compatibility (deprecated)
+KEY_ECB_YIELD_CURVE = "B.I8.EUR.4F.G_N_A.SV_C_YM.A.SR_1Y+SR_2Y+SR_3Y+SR_5Y+SR_10Y"
+
 # Retail Interest Rates (MIR dataflow)
 KEY_ECB_RETAIL_DEPOSIT_AVG = "B.U2.N.A.A.R.A.R.D.Q"  # Household overnight deposits
 KEY_ECB_RETAIL_LENDING_AVG = "B.U2.N.A.A.R.A.R.L.Q"  # Household lending (loans)
@@ -111,17 +136,25 @@ KEY_ECB_BOP_DIRECT_INVESTMENT = "Q.N.I8.W1.S1.S1.T.N.FA.F.F5.T.EUR._T.T.N"
 KEY_ECB_BOP_PORTFOLIO_INVESTMENT = "Q.N.I8.W1.S1.S1.T.N.FA.F.F6.T.EUR._T.T.N"
 KEY_ECB_BOP_FINANCIAL_DERIVATIVES = "Q.N.I8.W1.S1.S1.T.N.FA.F.F7.T.EUR._T.T.N"
 
-# STS (Short-term Statistics) Series Keys - FIXED according to ECB documentation
-# Note: Many STS series keys were incorrect and causing 404 errors
-# Temporarily disable problematic series until proper keys are found
-KEY_ECB_STS_INDUSTRIAL_PRODUCTION = "M.U2.Y.PROD.TOTAL.4.VAL"  # This may work
-KEY_ECB_STS_RETAIL_SALES = "M.EA.Y.RETS.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_CONSTRUCTION_OUTPUT = "M.EA.Y.CONS.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_UNEMPLOYMENT_RATE = "M.EA.S.UNEH.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_EMPLOYMENT_RATE = "Q.EA.S.EMPL.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_BUSINESS_CONFIDENCE = "M.EA.S.BSCI.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_CONSUMER_CONFIDENCE = "M.EA.S.CSCI.TOTAL.4.VAL"  # Fixed: EA instead of U2
-KEY_ECB_STS_CAPACITY_UTILIZATION = "Q.EA.S.CAPU.TOTAL.4.VAL"  # Fixed: EA instead of U2
+# STS (Short-term Statistics) Series Keys - UPDATED to I8 area code
+# Fixed area code from EA to I8 (Euro area including Croatia) per ECB SDMX latest DSD
+# Updated STS series (2023 DSD) – I8→U2 area code + final segments .A.V/.NSA
+# Industrial production index (Non-seasonally adjusted)
+KEY_ECB_STS_INDUSTRIAL_PRODUCTION = "M.U2.Y.PROD.NSO.NSA"
+# Retail sales volume index (Non-seasonally adjusted)
+KEY_ECB_STS_RETAIL_SALES = "M.U2.Y.RETS.NSO.NSA"
+# Construction output index (Non-seasonally adjusted)
+KEY_ECB_STS_CONSTRUCTION_OUTPUT = "M.U2.Y.CONS.NSO.NSA"
+# Unemployment rate – Level (% of active population)
+KEY_ECB_STS_UNEMPLOYMENT_RATE = "M.U2.S.UNEH.TOTAL.A.V"
+# Employment index (Quarterly)
+KEY_ECB_STS_EMPLOYMENT_RATE = "Q.U2.S.EMPL.TOTAL.A.V"
+# Business confidence indicator (Monthly, balances, SA)
+KEY_ECB_STS_BUSINESS_CONFIDENCE = "M.U2.S.BSCI.TOTAL.A.V"
+# Consumer confidence indicator (Monthly, balances, SA)
+KEY_ECB_STS_CONSUMER_CONFIDENCE = "M.U2.S.CSCI.TOTAL.A.V"
+# Capacity utilisation (%) – Quarterly
+KEY_ECB_STS_CAPACITY_UTILIZATION = "Q.U2.S.CAPU.TOTAL.A.V"
 
 # MIR (Interest Rates) Series Keys
 KEY_ECB_DEPOSIT_HOUSEHOLDS = "M.U2.B.A2A.A.R.A.2240.EUR.N"
@@ -172,7 +205,7 @@ KEY_ECB_PSS_PAYMENTS_VOLUME = "A.U2.N.PSS.PAYVOL.TOTAL.N"  # placeholder
 KEY_ECB_IRS_SWAP_RATE_10Y = "D.U2.N.IRS.SWAP.10Y.N"  # placeholder
 
 # Euro Short-Term Rate (EST)
-KEY_ECB_ESTR_RATE = "D.U2.ESTR"  # placeholder
+KEY_ECB_ESTR_RATE = "B.EU000A2X2A25.WT"  # Correct ECB €STR dataflow key from EST dataset (Daily-businessweek.EuroShortTermRate.VolumeWeightedTrimmedMeanRate)
 
 # ---------------------------------------------------------------------------
 # Backwards-compatibility aliases (client.py expects these names)

@@ -11,10 +11,15 @@ export interface AIModel {
   notes: string;
 }
 
+const fetcher = async (url: string): Promise<AIModel[]> => {
+  const response = await get<AIModel[]>(url);
+  return response.data;
+};
+
 export const useModelList = () => {
   const { data, error, isLoading } = useSWR<AIModel[]>(
     '/api/v1/ai/models',
-    (url) => get(url),
+    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 3600000, // 1 hour

@@ -27,26 +27,13 @@ async def get_ciss(
 ):
     try:
         data = await _svc(cache).get_ecb_ciss(start, end)
-    except AttributeError:
-        logger.warning("CISS service missing – using static snapshot fallback")
+    except AttributeError as exc:
+        logger.error("CISS service dependency missing: %s", exc)
         data = None
 
     if not data:
-        snapshot = {
-            "systemic_stress_index": {
-                "2025-07-10": 0.078,
-                "2025-07-11": 0.081,
-            }
-        }
-        return {
-            "status": "success",
-            "count": len(snapshot["systemic_stress_index"]),
-            "data": snapshot,
-            "metadata": {
-                "source": "ECB SDMX (CISS)",
-                "snapshot": True,
-            },
-        }
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ECB CISS data unavailable")
 
     return {
         "status": "success",

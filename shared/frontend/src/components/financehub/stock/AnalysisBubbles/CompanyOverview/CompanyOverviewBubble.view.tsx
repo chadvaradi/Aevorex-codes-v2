@@ -26,13 +26,41 @@ export const CompanyOverviewBubble: React.FC<CompanyOverviewBubbleProps> = ({ fu
                 Company Overview
             </h3>
             {fundamentals?.overview ? (
-                <div>
-                    <h4 className="font-semibold text-content-primary">
-                        {fundamentals.overview.name}
-                    </h4>
-                    <p className="text-sm text-content-secondary">
-                        {fundamentals.overview.sector}
-                    </p>
+                <div className="space-y-2">
+                    <div>
+                        <h4 className="font-semibold text-content-primary">
+                            {fundamentals.overview.name}
+                        </h4>
+                        <p className="text-sm text-content-secondary">
+                            {fundamentals.overview.sector}
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                        {typeof fundamentals.overview.pe_ratio === 'number' && (
+                            <div className="flex items-center justify-between">
+                                <span className="text-content-tertiary">P/E (ttm)</span>
+                                <span className="font-medium text-content-primary">
+                                    {fundamentals.overview.pe_ratio.toFixed(2)}
+                                </span>
+                            </div>
+                        )}
+                        {typeof fundamentals.overview.beta === 'number' && (
+                            <div className="flex items-center justify-between">
+                                <span className="text-content-tertiary">Beta</span>
+                                <span className="font-medium text-content-primary">
+                                    {fundamentals.overview.beta.toFixed(2)}
+                                </span>
+                            </div>
+                        )}
+                        {typeof fundamentals.overview.esg_score === 'number' && (
+                            <div className="flex items-center justify-between">
+                                <span className="text-content-tertiary">ESG</span>
+                                <span className="font-medium text-content-primary">
+                                    {fundamentals.overview.esg_score.toFixed(1)}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             ) : (
                 <p className="text-sm text-content-secondary" aria-live="polite">

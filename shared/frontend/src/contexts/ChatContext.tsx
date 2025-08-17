@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useLLMStream } from '../hooks/stock/useLLMStream';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface Message {
   id: string;
@@ -16,10 +15,12 @@ interface ChatContextType {
   ticker: string | null;
   chatOpen: boolean;
   sendMessage: (content: string) => void;
-  openChat: (ticker: string) => void;
+  openChat: (ticker: string, opts?: { inline?: boolean }) => void;
   closeChat: () => void;
   clearMessages: () => void;
   sendDeepAnalysis: (prompt?: string) => Promise<void>;
+  selectedModelId: string | null;
+  setSelectedModelId: (modelId: string | null) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -39,12 +40,53 @@ interface ChatProviderProps {
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [ticker, setTicker] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [selectedModelId, setSelectedModelIdState] = useState<string | null>(null);
+
+  // Initialise selected model from localStorage
+  React.useEffect(() => {
+    try {
+      const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('chatModelId') : null;
+      if (stored) setSelectedModelIdState(stored);
+    } catch {}
+  }, []);
+
+  const setSelectedModelId = useCallback((modelId: string | null) => {
+    setSelectedModelIdState(modelId);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        if (modelId) localStorage.setItem('chatModelId', modelId);
+        else localStorage.removeItem('chatModelId');
+      }
+    } catch {}
+  }, []);
+
+  // Bootstrap an SSE token once per session (used by gateway SSE)
+  React.useEffect(() => {
+    const ensureSseToken = async () => {
+      try {
+        // Avoid in tests
+        if (typeof window === 'undefined') return;
+        const existing = localStorage.getItem('sse_token');
+        if (existing) return;
+        const res = await fetch('/api/v1/config/model', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+        const data = await res.json().catch(() => ({}));
+        if (data && data.sse_token) {
+          localStorage.setItem('sse_token', data.sse_token as string);
+        }
+      } catch {}
+    };
+    ensureSseToken();
+  }, []);
 
   const {
     messages,
     isLoading,
     sendMessage: streamSendMessage,
     clearMessages: streamClearMessages,
+    beginExternalStream,
+    appendExternalStreamToken,
+    endExternalStream,
+    // seedAssistantMessage,
   } = useLLMStream(ticker, {
     onMessage: (message) => {
       // Handle individual message updates if needed
@@ -62,13 +104,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     streamSendMessage(content);
   }, [streamSendMessage]);
 
-  const openChat = useCallback((newTicker: string) => {
+  const openChat = useCallback((newTicker: string, opts?: { inline?: boolean }) => {
     setTicker(newTicker);
-    setChatOpen(true);
-    
     // Clear messages when switching tickers
     if (ticker !== newTicker) {
       streamClearMessages();
+    }
+    // Overlay only when not inline
+    if (!opts?.inline) {
+      setChatOpen(true);
     }
   }, [ticker, streamClearMessages]);
 
@@ -83,27 +127,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const sendDeepAnalysis = useCallback(async (prompt: string = `Deep dive analysis for ${ticker}`) => {
     if (!ticker || isLoading) return;
 
-    const userMessage: Message = {
-      id: uuidv4(),
-      role: 'user',
-      content: prompt,
-      timestamp: Date.now(),
-    };
-    // setMessages((prev) => [...prev, userMessage]); // This line was removed from the original file
-
-    // setIsLoading(true); // This line was removed from the original file
-    // setError(null); // This line was removed from the original file
-
-    const assistantId = uuidv4();
-    const assistantMessage: Message = {
-      id: assistantId,
-      role: 'assistant',
-      content: '',
-      timestamp: Date.now(),
-      isStreaming: true,
-    };
-    // setMessages((prev) => [...prev, assistantMessage]); // This line was removed from the original file
-    // setIsStreaming(true); // This line was removed from the original file
+    beginExternalStream();
 
     try {
       const response = await fetch(`/api/v1/stock/chat/${ticker}/deep`, {
@@ -112,7 +136,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, model_id: selectedModelId || undefined }),
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -121,7 +145,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       if (!reader) throw new Error('No reader');
 
       const decoder = new TextDecoder();
-      let content = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -131,21 +154,29 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         const lines = chunk.split('\n');
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') break;
-            content += data;
-            // setMessages((prev) => prev.map((msg) => msg.id === assistantId ? { ...msg, content } : msg)); // This line was removed from the original file
+            const dataStr = line.slice(6).trim();
+            if (!dataStr) continue;
+            if (dataStr === '[DONE]') break;
+            try {
+              const payload = JSON.parse(dataStr);
+              if (payload.type === 'end') {
+                // handled after loop
+              } else if (payload.type === 'token' && payload.token) {
+                appendExternalStreamToken(payload.token as string);
+              }
+            } catch {
+              appendExternalStreamToken(dataStr);
+            }
           }
         }
       }
-      // setMessages((prev) => prev.map((msg) => msg.id === assistantId ? { ...msg, isStreaming: false } : msg)); // This line was removed from the original file
+      endExternalStream();
     } catch (err) {
-      // setError(err.message); // This line was removed from the original file
+      console.error('Deep analysis stream failed', err);
     } finally {
-      // setIsLoading(false); // This line was removed from the original file
-      // setIsStreaming(false); // This line was removed from the original file
+      // flags handled by endExternalStream
     }
-  }, [ticker, isLoading]);
+  }, [ticker, isLoading, selectedModelId, beginExternalStream, appendExternalStreamToken, endExternalStream]);
 
   const value: ChatContextType = {
     messages,
@@ -157,6 +188,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     closeChat,
     clearMessages,
     sendDeepAnalysis,
+    selectedModelId,
+    setSelectedModelId,
   };
 
   return (

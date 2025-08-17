@@ -19,7 +19,7 @@ export const useSubHeaderLogic = (ticker?: string) => {
     return [
       { label: 'Stocks', path: ticker ? `/stock/${ticker}` : '/stock/AAPL' },
       { label: 'Macro Rates', path: '/macro-rates' },
-      { label: 'News', path: '/content-hub' },
+      { label: 'News', path: '/news' },
       { label: 'AI Hub', path: '/ai-hub' },
       { label: 'Health', path: '/healthhub' },
     ];

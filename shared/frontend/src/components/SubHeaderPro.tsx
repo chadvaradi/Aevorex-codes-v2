@@ -19,16 +19,18 @@ const SubHeaderPro: React.FC<SubHeaderProProps> = ({ ticker, className }) => {
   if (tabs.length === 0) return null;
 
   return (
-    <div 
-      className={`sticky glass-effect border-b border-neutral-200/60 dark:border-neutral-700/60 ${className || ''}`}
-      style={{ 
-        top: 'var(--header-height)', 
-        zIndex: 'var(--z-sticky)',
-        height: 'var(--subheader-height)',
+    <div
+      className={`sticky bg-white/95 dark:bg-neutral-900/95 backdrop-blur supports-backdrop-blur:border-b border-neutral-200/60 dark:border-neutral-800/60 ${className || ''}`}
+      style={{
+        top: 'var(--header-h)',
+        zIndex: 49,
+        height: 'var(--subheader-h)'
       }}
     >
-      <div className="relative flex items-center h-full px-6 lg:px-8 max-w-content mx-auto">
-        <nav className="relative flex gap-8 items-center h-full">
+      <div className="h-full">
+        <div className="max-w-7xl mx-auto h-full px-6 lg:px-8 relative flex items-center justify-center">
+          {/* Left: Tabs */}
+          <nav className="relative flex gap-8 items-center h-full">
           {tabs.map((tab, index) => (
             <Link
               key={tab.path}
@@ -63,29 +65,29 @@ const SubHeaderPro: React.FC<SubHeaderProProps> = ({ ticker, className }) => {
             </Link>
           ))}
           
-          {/* Animated indicator */}
-          <div
-            className="
-              absolute bottom-0 h-0.5 bg-primary-500 dark:bg-primary-400
-              transition-all duration-normal ease-spring
-              rounded-full
-            "
-            style={{
-              left: `${indicatorStyle.left}px`,
-              width: `${indicatorStyle.width}px`,
-            }}
-          />
-        </nav>
-        
-        {/* Right side actions */}
-        <div className="ml-auto flex items-center gap-4">
-          {ticker && (
-            <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-              <span className="font-medium">{ticker}</span>
-              <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse" />
-              <span className="text-xs">Live</span>
-            </div>
-          )}
+            {/* Animated indicator anchored to nav */}
+            <div
+              className="absolute bottom-0 h-0.5 bg-primary-500 dark:bg-primary-400 transition-all duration-normal ease-spring rounded-full"
+              style={{ left: `${indicatorStyle.left}px`, width: `${indicatorStyle.width}px` }}
+            />
+          </nav>
+
+          {/* Right: Quick link to Mainpage + Context (kept within container for symmetry) */}
+          <div className="absolute right-6 lg:right-8 top-1/2 -translate-y-1/2 flex items-center gap-4">
+            <Link
+              to="/"
+              className="px-3 py-1.5 text-xs font-medium rounded-md border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              Mainpage
+            </Link>
+            {ticker && (
+              <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <span className="font-medium">{ticker}</span>
+                <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse" />
+                <span className="text-xs">Live</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

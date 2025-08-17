@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 import type { NewsArticle } from '../types';
 
 // Helper to normalise backend raw item → NewsArticle
@@ -33,7 +33,7 @@ export const useStockNews = (
 
   const { data, error, isLoading } = useSWR<NewsResponse>(
     endpoint,
-    (url) => get(url),
+    (url) => swrFetcher<NewsResponse>(url),
     {
       revalidateOnFocus: false,
       dedupingInterval: 300000,

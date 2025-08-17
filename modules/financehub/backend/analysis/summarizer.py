@@ -95,6 +95,12 @@ class RealTimeAIAnalyzer:
             
         except Exception as e:
             logger.error(f"❌ AI analysis failed for {symbol}: {e}")
+            try:
+                from modules.financehub.backend.config import settings
+                if settings.ENVIRONMENT.NODE_ENV == "production":
+                    return {"status": "unavailable", "error": "AI analysis temporarily unavailable"}
+            except Exception:  # settings import should not break fallback behavior in dev
+                pass
             return self._generate_fallback_analysis(symbol)
 
     # --- All the private helper methods for calculation and generation ---

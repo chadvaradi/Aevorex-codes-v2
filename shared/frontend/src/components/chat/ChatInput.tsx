@@ -30,7 +30,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   // Persist selected model to backend on change
   const existingSession = typeof localStorage !== 'undefined' ? localStorage.getItem('chatSessionId') : null;
-  const initialSessionId = existingSession || crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  const initialSessionId = existingSession || (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
   if (!existingSession && typeof localStorage !== 'undefined') {
     localStorage.setItem('chatSessionId', initialSessionId);
   }

@@ -9,7 +9,29 @@ sets up task discovery for 'backend.core.tasks', and defines the
 Celery Beat schedule for periodic tasks like ticker tape updates.
 """
 
-import sys
+# ---------------------------------------------------------------------------
+# Early dev-mode short-circuit: completely skip Celery initialisation when the
+# FINANCEHUB_DISABLE_CELERY env flag is set (saves >100 MB RSS + log spam).
+# ---------------------------------------------------------------------------
+import os, sys, types
+
+if os.getenv("FINANCEHUB_DISABLE_CELERY") == "1":  # pragma: no cover – dev only
+    from types import SimpleNamespace as _SN
+
+    celery_app = _SN(
+        task=lambda *a, **kw: (lambda f: f),
+        conf=_SN(update=lambda *_a, **_kw: None),
+        beat_schedule={},
+    )  # lightweight stub satisfies imports
+
+    CELERY_DISABLED = True
+
+    # Replace module entry in sys.modules so downstream "import celery_app" gets stub
+    sys.modules[__name__] = sys.modules[__name__]
+
+    # Skip the heavy initialisation below entirely
+else:
+    import os
 from datetime import timedelta
 import logging # Import logging for potential setup issues
 

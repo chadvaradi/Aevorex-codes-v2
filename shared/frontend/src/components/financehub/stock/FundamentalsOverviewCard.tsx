@@ -44,6 +44,8 @@ const FundamentalsOverviewCard: React.FC<Props> = ({ ticker }) => {
   const mc = fundamentals.overview?.market_cap ?? null;
   const pe = fundamentals.overview?.pe_ratio ?? null;
   const metrics = fundamentals.metrics?.[0] ?? {};
+  const eps = (metrics as any)?.eps ?? null;
+  const dividendYield = (metrics as any)?.dividend_yield ?? null;
 
   return (
     <Card>
@@ -54,8 +56,8 @@ const FundamentalsOverviewCard: React.FC<Props> = ({ ticker }) => {
         <div className="space-y-1 text-sm">
           <div className="flex justify-between"><span>Market Cap</span><span>{mc ? mc.toLocaleString() : '-'}</span></div>
           <div className="flex justify-between"><span>P/E (TTM)</span><span>{pe ?? '-'}</span></div>
-          <div className="flex justify-between"><span>EPS (TTM)</span><span>{metrics.eps ?? '-'}</span></div>
-          <div className="flex justify-between"><span>Dividend Yield</span><span>{metrics.dividend_yield ?? '-'}</span></div>
+          <div className="flex justify-between"><span>EPS (TTM)</span><span>{eps ?? '-'}</span></div>
+          <div className="flex justify-between"><span>Dividend Yield</span><span>{dividendYield ?? '-'}</span></div>
         </div>
       </CardContent>
     </Card>

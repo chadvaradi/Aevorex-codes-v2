@@ -16,6 +16,7 @@ class APIKeysSettings(BaseSettings):
     FMP: SecretStr | None = Field(default=None, description="Financial Modeling Prep (FMP) API kulcs (SecretStr).")
     NEWSAPI: SecretStr | None = Field(default=None, description="NewsAPI.org API kulcs (SecretStr).")
     EODHD: SecretStr | None = Field(default=None, description="EOD Historical Data API kulcs (SecretStr).")
+    FRED: SecretStr | None = Field(default=None, description="Federal Reserve (FRED) API key (SecretStr).")
 
     @field_validator('*', mode="before")
     @classmethod

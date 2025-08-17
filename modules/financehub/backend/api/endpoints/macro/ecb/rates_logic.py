@@ -98,25 +98,21 @@ def build_response(
         "message": "ECB short-end rates grid retrieved successfully.",
     }
 
-def get_short_end_rates(
+async def get_short_end_rates(
     service: MacroDataService,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
     period: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """High-level helper used by the FastAPI view layer."""
+    """Async helper that fetches policy & ESTR rates and maps them to tenor-grid."""
 
     start_date, end_date = resolve_date_range(start_date, end_date, period)
 
     try:
-        raw_rates = service.loop.run_until_complete(
-            service.get_ecb_policy_rates(start_date, end_date)
-        )
+        raw_rates = await service.get_ecb_policy_rates(start_date, end_date)
 
-        # Merge ESTR (O/N) into the same dict keyed by date
-        estr_data = service.loop.run_until_complete(
-            service.get_ecb_estr_rate(start_date, end_date)
-        )
+        # Merge Euro Short-Term Rate (ON) if available
+        estr_data = await service.get_ecb_estr_rate(start_date, end_date)
         if estr_data:
             for d, v in estr_data.items():
                 raw_rates.setdefault(d, {})["Euro Short-Term Rate"] = v
@@ -125,13 +121,18 @@ def get_short_end_rates(
         raw_rates = {}
 
     if not raw_rates:
-        logger.warning("ECB rates data empty – using static fallback snapshot")
-        raw_rates = {
-            end_date.isoformat(): {
-                "Deposit Facility Rate": 4.0,
-                "Main Refinancing Operations Rate": 4.5,
-                "Marginal Lending Facility Rate": 4.75,
-            }
+        return {
+            "status": "unavailable",
+            "message": "ECB policy rates unavailable for requested period.",
+            "metadata": {
+                "source": "ECB SDMX (FM dataflow)",
+                "date_range": {
+                    "start": start_date.isoformat(),
+                    "end": end_date.isoformat(),
+                    "period": period or "custom",
+                },
+            },
+            "data": {},
         }
 
     grid = map_short_end_tenors(raw_rates)

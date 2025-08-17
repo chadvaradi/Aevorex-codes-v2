@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface YieldCurvePoint {
   tenor: string; // e.g. '1Y'
@@ -63,7 +63,7 @@ const transformYieldCurveData = (backendData: BackendYieldCurveResponse): YieldC
 export const useECBYieldCurve = () => {
   const { data, error, isLoading, mutate } = useSWR<BackendYieldCurveResponse>(
     '/api/v1/macro/ecb/yield-curve',
-    get,
+    (url) => swrFetcher<BackendYieldCurveResponse>(url),
     {
       refreshInterval: 300000,
       revalidateOnFocus: false,

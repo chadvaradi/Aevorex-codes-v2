@@ -27,30 +27,13 @@ async def get_trd(
 ):
     try:
         data = await _svc(cache).get_ecb_trd(start, end)
-    except AttributeError:
-        logger.warning("TRD service missing – using static snapshot fallback")
+    except AttributeError as exc:
+        logger.error("TRD service method missing: %s", exc)
         data = None
 
     if not data:
-        snapshot = {
-            "exports_eur_mn": {
-                "2025-04": 221_000,
-                "2025-05": 228_500,
-            },
-            "imports_eur_mn": {
-                "2025-04": 199_800,
-                "2025-05": 205_450,
-            },
-        }
-        return {
-            "status": "success",
-            "count": len(snapshot["exports_eur_mn"]) + len(snapshot["imports_eur_mn"]),
-            "data": snapshot,
-            "metadata": {
-                "source": "ECB SDMX (TRD)",
-                "snapshot": True,
-            },
-        }
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="ECB TRD data unavailable")
 
     return {
         "status": "success",

@@ -1,0 +1,4 @@
+modules/shared/frontend/src/hooks/stock/useSearchData.ts
+modules/shared/frontend/src/hooks/auth/useAuth.tsx
+shared/frontend/src/hooks/stock/useSearchData.ts
+shared/frontend/src/hooks/auth/useAuth.tsx

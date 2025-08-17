@@ -46,9 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dynamic Endpoint Lister**: Debugged and fixed numerous underlying issues that caused the `runtime_endpoint_lister.py` script to fail, enabling future automated drift detection.
 - **Auth Logout Endpoint**: Corrected the `/api/v1/auth/logout` endpoint from `GET` to `POST` to match RESTful principles and frontend implementation, resolving a Blocker.
 - **Chat Stream Endpoint**: Corrected the `/api/v1/stock/chat/{ticker}/stream` endpoint from `POST` to `GET` to comply with Server-Sent Events (SSE) standards, resolving a Blocker.
-- **Missing Forex Endpoint**: Added a mock implementation for the `GET /api/v1/macro/forex/pairs` endpoint to unblock frontend development.
+- **Missing Forex Endpoint**: (Historical note) A temporary dev-only mock was used to unblock FE. As of current policy, PROD uses only real providers and returns structured N/A on errors.
 - **API Client Error Handling**: Enhanced the frontend `api.ts` helper to automatically handle `401 Unauthorized` responses by redirecting to the login page.
-- **Deprecated Endpoint Stability**: Stabilized the deprecated `/header/{ticker}` endpoint by removing its broken dependencies and returning a mock response, ensuring it doesn't crash the server on startup.
+- **Deprecated Endpoint Stability**: Stabilized the deprecated `/header/{ticker}` endpoint by removing broken deps. Note: PROD no longer serves mock responses; returns structured N/A or 410 where applicable.
 
 ### Changed
 - **Development Strategy**: Pivoted from a failing dynamic endpoint discovery to a static analysis approach (`grep`) to generate an initial endpoint matrix, allowing the project to move forward despite backend instability.

@@ -122,7 +122,7 @@ python3 start_server.py financehub --port 8084
 
 ### API Endpoints ✅
 - `GET /api/v1/stock/{ticker}` - Stock adatok
-- `POST /api/v1/stock/chat/{ticker}/stream` - AI streaming
+- `GET /api/v1/stock/chat/{ticker}/stream` - AI streaming
 - `GET /api/v1/stock/ticker-tape/` - Ticker szalag
 - `GET /api/v1/docs` - API dokumentáció
 

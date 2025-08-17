@@ -1,0 +1,385 @@
+{
+  "generated": "2025-07-11T09:44:43.020485",
+  "summary": {
+    "ok_full": 60,
+    "error_payload": 0,
+    "empty_200": 0,
+    "4xx": 1,
+    "5xx": 0,
+    "other": 1
+  },
+  "details": [
+    {
+      "path": "/metrics",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/health",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/rates",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/monetary-policy",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/retail-rates",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/yield-curve",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/yield-curve/lite",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/historical-yield-curve",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/fx",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/fx/legacy",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/comprehensive",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/monetary-aggregates",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/inflation",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/components",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bop/health",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/indicators",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sts/latest",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bsi/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/mir/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/components",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/sec/health",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/ivf/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/cbd/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/rpp/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/cpp/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/bls/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/spf/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/ciss/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/trd/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/pss/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/irs/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/ecb/hicp/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/bubor",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/forex/pairs",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/forex/{pair}",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/macro/forex/{pair}/history",
+      "method": "GET",
+      "status": 400,
+      "result": "4xx"
+    },
+    {
+      "path": "/api/v1/macro/curve/{source}",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/search",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}/stream",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}/deep",
+      "method": "POST",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/chat/{ticker}",
+      "method": "POST",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/chart",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/fundamentals",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/{ticker}/news",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/premium/{ticker}/summary",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/ticker-tape/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/stock/ticker-tape/item",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/model",
+      "method": "POST",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/deep",
+      "method": "POST",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/config/language",
+      "method": "POST",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/login",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/callback",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/status",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 204,
+      "result": "other"
+    },
+    {
+      "path": "/api/v1/crypto/symbols",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/crypto/{symbol}",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/market/news",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/eodhd/{ticker}/{dataset}",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    },
+    {
+      "path": "/api/v1/ai/models/",
+      "method": "GET",
+      "status": 200,
+      "result": "ok_full"
+    }
+  ]
+}

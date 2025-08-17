@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '../../lib/api';
+import { swrFetcher } from '../../lib/api';
 
 export interface RateHistory {
   [date: string]: {
@@ -33,7 +33,7 @@ const getLatestRates = (history: RateHistory | undefined) => {
 export const useECBRates = () => {
   const { data, error, isLoading } = useSWR<ECBData>(
     '/api/v1/macro/ecb/rates?period=1y',
-    get
+    (url) => swrFetcher<ECBData>(url)
   );
 
   return {

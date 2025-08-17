@@ -11,7 +11,7 @@ from modules.financehub.backend.core.fetchers.macro.ecb_client import (
     ECBSDMXClient,
     ECBAPIError,
 )
-from modules.financehub.backend.core.fetchers.macro.bubor_client import (
+from modules.financehub.backend.core.fetchers.macro.ecb_client.bubor_client import (
     BUBORClient,
     BUBORAPIError,
 )
@@ -41,13 +41,18 @@ class BaseMacroService:
             return await fetch_func()
         except (ECBAPIError, BUBORAPIError) as exc:
             logger.error("API fetch failed for %s: %s", cache_key, exc, exc_info=True)
-            if self._cache:
+            try:
+                from modules.financehub.backend.config import settings
+                prod = settings.ENVIRONMENT.NODE_ENV == "production"
+            except Exception:
+                prod = False
+            if not prod and self._cache:
                 cached = await self._cache.get(cache_key)
                 if cached:
-                    logger.warning("Serving stale data for %s", cache_key)
+                    logger.warning("Serving stale data for %s (dev only)", cache_key)
                     return json.loads(cached)
             logger.error("No cache available for %s", cache_key)
-            return {}  # graceful degrade – caller decides 404/502
+            return {}
 
     # convenience import for public typing
     from typing import Dict as _DictAlias  # noqa: F401 

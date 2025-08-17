@@ -34,14 +34,9 @@ async def get_ecb_bsi(
             start_date = end_date - timedelta(days=365 * 3)
 
         data = await service.get_ecb_bsi(start_date, end_date)
+        from fastapi import HTTPException
         if not data:
-            logger.warning("ECB BSI empty – using offline snapshot (2025-07-10)")
-            # Minimal offline sample for M1–M3 (monthly)
-            data = {
-                "2025-06": {"M1": 10432.3, "M2": 13567.8, "M3": 15567.9},
-                "2025-05": {"M1": 10398.2, "M2": 13498.7, "M3": 15499.3},
-            }
-            # Fall through to success payload
+            raise HTTPException(status_code=503, detail="ECB BSI data unavailable")
 
         return {
             "status": "success",
@@ -54,16 +49,6 @@ async def get_ecb_bsi(
             "data": data,
         }
     except Exception as exc:
-        logger.error("BSI endpoint error – serving offline snapshot", exc_info=True)
-        snapshot_data = {
-            "2025-06": {"M1": 10432.3, "M2": 13567.8, "M3": 15567.9},
-            "2025-05": {"M1": 10398.2, "M2": 13498.7, "M3": 15499.3},
-        }
-        return {
-            "status": "success",
-            "metadata": {
-                "source": "offline-snapshot",
-                "error": str(exc),
-            },
-            "data": snapshot_data,
-        } 
+        from fastapi import HTTPException
+        logger.error("BSI endpoint error: %s", exc, exc_info=True)
+        raise HTTPException(status_code=503, detail="ECB BSI endpoint error") 

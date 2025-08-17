@@ -15,6 +15,7 @@ load_environment_once()
 from contextlib import asynccontextmanager
 import logging
 import httpx
+import os
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -97,6 +98,28 @@ async def lifespan(app: FastAPI):
     else:
         lifespan_logger.warning("StockOrchestrator not initialised because cache is unavailable.")
 
+    # --- Diagnostics: EODHD key presence (masked) & route dump (subset) ---
+    try:
+        eodhd_key_present = bool(os.getenv("FINBOT_API_KEYS__EODHD") or os.getenv("EODHD_API_KEY"))
+        lifespan_logger.info("EODHD key present: %s", "yes" if eodhd_key_present else "no")
+    except Exception:
+        lifespan_logger.info("EODHD key present: unknown")
+
+    try:
+        api_prefix = settings.API_PREFIX.rstrip("/")
+        sample_routes = []
+        for r in getattr(app, "routes", []):
+            path = getattr(r, "path", "")
+            methods = sorted(getattr(r, "methods", []) or [])
+            if path.startswith(api_prefix):
+                sample_routes.append((path, ",".join(methods)))
+        # log only a limited subset to avoid noisy output
+        sample_routes = sorted(sample_routes)[:25]
+        for p, m in sample_routes:
+            lifespan_logger.info("Route registered: %s [%s]", p, m)
+    except Exception as _route_err:
+        lifespan_logger.warning("Route dump failed: %s", _route_err)
+
     yield
 
     # Shutdown sequence
@@ -153,24 +176,53 @@ def create_app(lite: bool = False) -> FastAPI:
     # --- Middleware Setup ---
     # Session Middleware for Google OAuth
     if settings.GOOGLE_AUTH.ENABLED:
+        # Decide cookie flags based on redirect URI host/scheme to guarantee
+        # correct behavior in local HTTP dev (no Secure, SameSite=Lax) while
+        # keeping production HTTPS with SameSite=None; Secure.
+        try:
+            from urllib.parse import urlparse
+            ru = urlparse(str(settings.GOOGLE_AUTH.REDIRECT_URI))
+            is_local_http = (ru.scheme == "http") and (ru.hostname in {"localhost", "127.0.0.1"})
+            cookie_domain = None if is_local_http else (ru.hostname or None)
+        except Exception:
+            is_local_http = False
+            cookie_domain = None
+
+        if is_local_http:
+            session_same_site = "lax"      # send on same-site navigations
+            session_https_only = False      # allow over HTTP in dev
+        else:
+            session_same_site = "none"     # allow cross-site in production (gateway → backend)
+            session_https_only = True       # require HTTPS in production
+
         app.add_middleware(
             SessionMiddleware,
-            secret_key=settings.GOOGLE_AUTH.SECRET_KEY.get_secret_value()
+            secret_key=settings.GOOGLE_AUTH.SECRET_KEY.get_secret_value(),
+            same_site=session_same_site,
+            https_only=session_https_only,
+            domain=cookie_domain,
         )
 
     # ------------------------------------------------------------------
     # CORS Middleware – Demo-friendly configuration
     # ------------------------------------------------------------------
+    # Build allowed origins from settings.CORS, fallback to dev friendly defaults
+    allowed_origins = [
+        "http://localhost:8083",
+        "http://127.0.0.1:8083",
+    ]
+    # Include common local network pattern if Vite exposes a Network URL
+    if "http://0.0.0.0:8083" not in allowed_origins:
+        allowed_origins.append("http://0.0.0.0:8083")
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:8083",
-            "http://127.0.0.1:8083",
-        ],
-        allow_origin_regex=None,  # Explicit list improves security & Safari CORS
-        allow_credentials=True,   # Needed when frontend includes credentials
+        allow_origins=allowed_origins,
+        allow_origin_regex=None,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["content-type"],
         max_age=3600,
     )
 

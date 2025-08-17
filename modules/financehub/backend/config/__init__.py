@@ -46,6 +46,30 @@ class Settings(BaseSettings):
         default="postgresql://username:password@localhost:5432/financehub",
         description="PostgreSQL database connection URL for subscription data"
     )
+    
+    # Supabase configuration
+    SUPABASE_URL: str = Field(
+        default="",
+        description="Supabase project URL"
+    )
+    SUPABASE_ANON_KEY: str = Field(
+        default="",
+        description="Supabase anonymous API key"
+    )
+
+    # JWT configuration
+    JWT_SECRET_KEY: str = Field(
+        default="your-secret-key-change-in-production",
+        description="Secret key for JWT token signing"
+    )
+    JWT_ALGORITHM: str = Field(
+        default="HS256",
+        description="JWT signing algorithm"
+    )
+    JWT_EXPIRATION_TIME: int = Field(
+        default=3600,
+        description="JWT token expiration time in seconds"
+    )
 
     # Embedded settings groups
     APP_META: ApplicationMetaSettings = Field(default_factory=ApplicationMetaSettings)

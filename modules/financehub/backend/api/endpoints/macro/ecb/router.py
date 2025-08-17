@@ -76,3 +76,18 @@ router.include_router(trd_router)
 router.include_router(pss_router)
 # Final sub-router
 router.include_router(irs_router) 
+
+# Lightweight policy-notes placeholder to avoid 404 in UI tooltips
+@router.get("/policy-notes", tags=["ECB"], summary="Policy notes (placeholder)")
+async def policy_notes_placeholder():
+    return {
+        "status": "success",
+        "data": [
+            {
+                "date": "2025-08-08",
+                "note": "ECB policy notes service not configured in dev; this is a placeholder.",
+                "source": "ecb",
+                "relevance_score": 0.7,
+            }
+        ],
+    }

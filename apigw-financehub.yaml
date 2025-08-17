@@ -1,0 +1,403 @@
+swagger: "2.0"
+info:
+  title: Aevorex FinanceHub Gateway
+  version: 1.0.0
+schemes:
+  - https
+x-google-endpoints:
+  - name: financehub-gw-v4-xfuyee5.ew.gateway.dev
+    allowCors: true
+x-google-backend:
+  address: https://financehub-backend-72792803165.europe-west1.run.app
+  path_translation: APPEND_PATH_TO_ADDRESS
+security:
+  - google_id_token: []
+  - google_id_token_alt: []
+paths:
+  /api/v1/health:
+    get:
+      summary: Health
+      operationId: health
+      security: []
+      responses:
+        "200":
+          description: ok
+    options:
+      summary: CORS preflight
+      operationId: healthOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+  /api/v1/auth/login:
+    get:
+      summary: Auth login JSON
+      operationId: authLogin
+      security: []  # allow unauthenticated to obtain auth_url
+      responses:
+        "200":
+          description: ok
+  /api/v1/auth/start:
+    get:
+      summary: Auth cookie-seed + redirect (HTML)
+      operationId: authStart
+      security: []  # must be public
+      responses:
+        "200":
+          description: ok
+    options:
+      summary: CORS preflight
+      operationId: authStartOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+  /api/v1/auth/status:
+    get:
+      summary: Auth status
+      operationId: authStatus
+      security: []  # allow unauthenticated status checks
+      responses:
+        "200":
+          description: ok
+    options:
+      summary: CORS preflight
+      operationId: authStatusOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+  /api/v1/auth/callback:
+    get:
+      summary: OAuth callback
+      operationId: authCallback
+      security: []  # must be public for Google redirect
+      responses:
+        "200":
+          description: ok
+    options:
+      summary: CORS preflight
+      operationId: authCallbackOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+  
+
+  /docs:
+    get:
+      summary: API docs (FastAPI Swagger UI)
+      operationId: docsUi
+      security: []
+      responses:
+        "200":
+          description: ok
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+    options:
+      summary: CORS preflight
+      operationId: docsOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+
+  /redoc:
+    get:
+      summary: API docs (ReDoc)
+      operationId: redocUi
+      security: []
+      responses:
+        "200":
+          description: ok
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+    options:
+      summary: CORS preflight
+      operationId: redocOptions
+      security: []
+      responses:
+        "204":
+          description: No Content
+
+  /openapi.json:
+    get:
+      summary: OpenAPI schema
+      operationId: openapiSchema
+      security: []
+      responses:
+        "200":
+          description: ok
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- Explicit Stock endpoints (deterministic forwarding) ----
+  /api/v1/stock/{ticker}:
+    get:
+      summary: Stock snapshot
+      operationId: stockSnapshot
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/{ticker}/chart:
+    get:
+      summary: Stock chart
+      operationId: stockChart
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/{ticker}/fundamentals:
+    get:
+      summary: Stock fundamentals
+      operationId: stockFundamentals
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/{ticker}/news:
+    get:
+      summary: Stock news
+      operationId: stockNews
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/{ticker}/technical:
+    get:
+      summary: Stock technical analysis (alias)
+      operationId: stockTechnical
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # removed duplicate /api/v1/stock/{ticker}/technical definition
+
+  /api/v1/stock/premium/{ticker}/summary:
+    get:
+      summary: Premium AI summary
+      operationId: stockPremiumSummary
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/ticker-tape:
+    get:
+      summary: Ticker tape
+      operationId: stockTickerTape
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- Market endpoints ----
+  /api/v1/market/news:
+    get:
+      summary: Market news
+      operationId: marketNews
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- Macro FX endpoints (public for now to allow session-based auth) ----
+  /api/v1/macro/forex/{pair}:
+    get:
+      summary: Macro FX (EUR/*) latest rate
+      operationId: macroForexPair
+      parameters:
+        - name: pair
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- Chat endpoints ----
+  /api/v1/stock/chat/{ticker}:
+    post:
+      summary: Chat non-stream
+      operationId: chatPost
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/chat/{ticker}/deep:
+    post:
+      summary: Chat deep analysis
+      operationId: chatDeep
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/stock/chat/{ticker}/stream:
+    get:
+      summary: Chat SSE stream
+      operationId: chatStream
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- TradingView endpoints ----
+  /api/v1/tv/bars:
+    get:
+      summary: TV bars
+      operationId: tvBars
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  # ---- Quant endpoints ----
+  /api/v1/quant/factors/{ticker}:
+    get:
+      summary: Quant factors
+      operationId: quantFactors
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/quant/signals/{ticker}:
+    get:
+      summary: Quant signals
+      operationId: quantSignals
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          type: string
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/quant/backtest:
+    post:
+      summary: Quant backtest baseline
+      operationId: quantBacktest
+      security: []
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/tv/symbols:
+    get:
+      summary: TV symbols
+      operationId: tvSymbols
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+
+  /api/v1/tv/symbols/{symbol}:
+    get:
+      summary: TV symbol config
+      operationId: tvSymbolConfig
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          type: string
+      responses:
+        "200": { description: ok }
+      x-google-backend:
+        address: https://financehub-backend-72792803165.europe-west1.run.app
+securityDefinitions:
+  google_id_token:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://accounts.google.com"
+    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v3/certs"
+    x-google-audiences: "72792803165-i05lggthblb65lpdd3t6rlu5adobo3fi.apps.googleusercontent.com"
+    x-google-jwt-locations:
+      - header: "Authorization"
+        value_prefix: "Bearer "
+  google_id_token_alt:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "accounts.google.com"
+    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v3/certs"
+    x-google-audiences: "72792803165-i05lggthblb65lpdd3t6rlu5adobo3fi.apps.googleusercontent.com"
+    x-google-jwt-locations:
+      - header: "Authorization"
+        value_prefix: "Bearer "

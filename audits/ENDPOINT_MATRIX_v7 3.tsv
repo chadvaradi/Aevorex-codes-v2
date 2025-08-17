@@ -1,0 +1,3 @@
+--- Phase 1: Discovering Backend Endpoints (Runtime Analysis) ---
+Executing runtime endpoint lister via direct function call...
+An unexpected error occurred during runtime endpoint discovery: Command '['/Users/varadicsanad/Downloads/Aevorex_local/venv/bin/python3', '/Users/varadicsanad/Downloads/Aevorex_local/tools/runtime_endpoint_lister.py']' returned non-zero exit status 1.

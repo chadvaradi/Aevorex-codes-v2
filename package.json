@@ -6,7 +6,8 @@
     "shared/frontend"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "pnpm dev:frontend",
+    "dev:frontend": "cd shared/frontend && pnpm dev",
     "build": "tsc && vite build",
     "lint": "cd shared/frontend && eslint \"src/**/*.{ts,tsx}\" --report-unused-disable-directives --max-warnings 50",
     "typecheck": "tsc -p shared/frontend/tsconfig.json --noEmit",

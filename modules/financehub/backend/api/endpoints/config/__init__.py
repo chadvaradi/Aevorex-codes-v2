@@ -4,6 +4,7 @@ from modules.financehub.backend.api.deps import get_cache_service
 from modules.financehub.backend.utils.cache_service import CacheService
 from modules.financehub.backend.api.endpoints.stock_endpoints.chat.handlers import config_handler
 from modules.financehub.backend.models.chat import ChatModelRequest, DeepToggleRequest
+from modules.financehub.backend.core.security.sse_token import mint_sse_token
 
 config_router = APIRouter(tags=["Config"], prefix="/config")
 
@@ -25,7 +26,12 @@ async def set_model(request: dict | ChatModelRequest | None = Body(None), cache:
             await config_handler.handle_set_chat_model(request_obj, cache)
     elif isinstance(request, ChatModelRequest):
         await config_handler.handle_set_chat_model(request, cache)
-    return {"status": "success"}
+    # Issue a fresh ephemeral SSE token for clients that need to open EventSource via gateway
+    try:
+        sse = mint_sse_token("session")
+    except Exception:
+        sse = None
+    return {"status": "success", "sse_token": sse}
 
 
 @config_router.post(

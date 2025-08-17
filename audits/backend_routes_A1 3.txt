@@ -1,0 +1,31 @@
+modules/financehub/backend/api/endpoints/ai/models.py:61:@router.get(
+modules/financehub/backend/api/endpoints/ai/models.py:72:@router.get("/models", response_model=list[dict[str, Any]])
+modules/financehub/backend/api/endpoints/auth.py:103:@router.get("/logout", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:32:@router.get("/login", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:59:@router.get("/callback", tags=["Auth"])
+modules/financehub/backend/api/endpoints/auth.py:94:@router.get("/status", tags=["Auth"])
+modules/financehub/backend/api/endpoints/macro/ecb.py:20:@router.get("/rates", summary="Get ECB Policy Rates")
+modules/financehub/backend/api/endpoints/macro/ecb.py:50:@router.get("/yield-curve", summary="Get ECB Yield Curve")
+modules/financehub/backend/api/endpoints/macro/ecb.py:85:@router.get("/monetary-policy", summary="Get ECB Monetary Policy Info")
+modules/financehub/backend/api/endpoints/macro/rates.py:27:@router.get("/rates/all")
+modules/financehub/backend/api/endpoints/macro/rates.py:80:@router.get("/all", deprecated=True)
+modules/financehub/backend/api/endpoints/macro/rates.py:90:@router.get("/curve/{source}", deprecated=True)
+modules/financehub/backend/api/endpoints/stock_endpoints/chart/chart_data.py:30:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:29:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:41:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:55:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:69:@router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:82:# @router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/chat/router.py:95:# @router.post(
+modules/financehub/backend/api/endpoints/stock_endpoints/fundamentals/fundamentals_stock.py:29:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/news/news_stock.py:29:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/router.py:21:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/ai_summary/router.py:41:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/premium/technical_analysis/technical_analysis_stock.py:37:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/search/search_stock.py:54:@router.get("/search", response_model=SearchResponse)
+modules/financehub/backend/api/endpoints/stock_endpoints/stock_header/stock_header.py:23:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/stock_header/stock_header.py:60:@router.get(
+modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:163:@router.get("", include_in_schema=False)
+modules/financehub/backend/api/endpoints/stock_endpoints/ticker_tape/ticker_tape.py:30:@router.get(
+modules/financehub/backend/api/market_data.py:48:@router.get(
+modules/financehub/backend/core/metrics/prometheus_exporter.py:139:    @router.get("/metrics", summary="Prometheus metrics")

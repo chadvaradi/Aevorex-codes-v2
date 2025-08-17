@@ -21,13 +21,18 @@ authors = ["AEVOREX Team <contact@aevorex.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.110.0"
-uvicorn = {extras = ["standard"], version = "^0.29.0"}
+python = ">=3.11,<3.14"  # Allow 3.13 local dev until upstream resolves
+fastapi = "0.109.2"
+# Pin uvicorn to 0.22.0 – includes legacy "uvicorn.loops.auto" module needed when spawning workers under Python 3.13
+uvicorn = {extras = ["standard"], version = "0.22.0"}
 pydantic = "^2.6.4"
 pydantic-settings = "^2.2.1"
 redis = {extras = ["hiredis"], version = "4.6.0"}
-httpx = "^0.27.0"
+# httpx with ASGITransport requires the http2 extra in 0.26.x
+httpx = "0.25.2"
+
+# Ensure Starlette stays on the stable series compatible with FastAPI 0.110
+starlette = "0.36.3"
 pandas = "^2.2.1"
 openpyxl = "^3.1.2"
 python-dotenv = "^1.0.1"

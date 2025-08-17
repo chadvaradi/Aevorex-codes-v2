@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface SummaryResponse {
   summary: string;
@@ -17,7 +17,7 @@ export const useAISummary = (
 
   const { data, error, isLoading } = useSWR<SummaryResponse>(
     endpoint,
-    (url) => get(url),
+    (url) => swrFetcher<SummaryResponse>(url),
     {
       revalidateOnFocus: false,
       dedupingInterval: 600000,

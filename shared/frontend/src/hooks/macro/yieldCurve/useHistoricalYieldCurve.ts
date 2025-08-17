@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface RawYieldCurveData {
   [date: string]: {
@@ -16,7 +16,7 @@ export const useHistoricalYieldCurve = () => {
     isLoading,
   } = useSWR<RawYieldCurveData>(
     API_ENDPOINT,
-    (url) => get(url),
+    (url) => swrFetcher<RawYieldCurveData>(url),
     {
       revalidateOnFocus: false,
       dedupingInterval: 3600000,

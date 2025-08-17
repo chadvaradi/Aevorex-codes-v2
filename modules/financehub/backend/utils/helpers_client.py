@@ -37,7 +37,7 @@ async def make_api_request(
     source_name_for_log: str,
     params: dict[str, Any] | None = None,
     headers: dict[str, Any] | None = None,
-    cache_service: CacheService | None = None,
+    cache_service: Any | None = None,
     cache_key_for_failure: str | None = None,
     http_timeout: float = 30.0,
     cache_enabled: bool = True,
@@ -104,21 +104,21 @@ def get_request_id(symbol: str, context: str) -> str:
     return f"[{symbol.upper()}:{context}:{uuid.uuid4().hex[:6]}]"
 
 def get_user_id(request: Request) -> str:
+    """Retrieve a stable user identifier from the session or raise.
+
+    Contract:
+    - If a user session exists with an email → return that email.
+    - If no session is present → return an anonymous stable ID derived from
+      the client (no mock user). This avoids fabricating data while keeping
+      logs/grouping consistent.
     """
-    Retrieves a user identifier from the request session.
+    user = request.session.get('user') if hasattr(request, 'session') else None
+    if isinstance(user, dict) and user.get('email'):
+        return user['email']
 
-    In a real application, this would involve looking up the user from
-    a session cookie or a decoded JWT. For now, it supports a mock
-    user for development purposes.
-
-    Args:
-        request: The FastAPI request object.
-
-    Returns:
-        A string representing the user ID.
-    """
-    # TODO: Replace with real user session lookup
-    if 'user' in request.session and 'email' in request.session['user']:
-        return request.session['user']['email']
-    
-    return "mock_user_id_for_dev"
+    # Anonymous path: derive a deterministic fingerprint from client IP/UA
+    # without persisting PII. This is NOT a mock user.
+    client_ip = request.client.host if getattr(request, 'client', None) else "0.0.0.0"
+    ua = request.headers.get("user-agent", "unknown")
+    anon = uuid.uuid5(uuid.NAMESPACE_URL, f"finbot:{client_ip}:{ua}")
+    return f"anon::{str(anon)[:12]}"

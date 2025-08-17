@@ -53,21 +53,9 @@ async def stream_openai_response(
     background_tasks: BackgroundTasks,
     request_id: str
 ) -> AsyncGenerator[str, None]:
-    """Streams a response from the OpenAI API."""
-    # This is a simplified streaming logic.
-    # In a real application, this would call the actual AI service.
-    async def generate_summary():
-        # Placeholder for actual AI call
-        yield 'data: {"type": "token", "content": "AI response is being generated...", "done": false}\n\n'
-        await asyncio.sleep(1)
-        yield 'data: {"type": "token", "content": "Analysis complete.", "done": true}\n\n'
-
-    async for chunk in generate_summary():
-        yield chunk
+    """Streaming placeholder removed (no-mock). Raise until real LLM is wired."""
+    raise RuntimeError("LLM streaming not configured. Please wire a real provider.")
 
 async def generate_summary_for_stock_data(*args, **kwargs):
-    """
-    Placeholder for the background task that generates and caches the summary.
-    """
-    # In a real implementation, this would call the AI service and cache the result.
-    logger.info("Background task: Generating and caching AI summary.")
+    """Removed mock background task. Use real LLM job executor when available."""
+    raise RuntimeError("LLM summary generation not configured.")

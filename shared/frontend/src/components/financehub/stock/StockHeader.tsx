@@ -32,7 +32,7 @@ const StockHeader: React.FC<StockHeaderProps> = ({ fundamentals, chartData, load
     const sector = fundamentals?.overview?.sector ?? 'N/A';
 
     // Get latest price from chart data
-    const ohlcv = chartData.chart_data.ohlcv;
+    const ohlcv = (chartData as any)?.data?.ohlcv || (chartData as any)?.ohlcv || [];
     const latestChartPoint = ohlcv?.[ohlcv.length - 1];
     const currentPrice = latestChartPoint?.close || 0;
     

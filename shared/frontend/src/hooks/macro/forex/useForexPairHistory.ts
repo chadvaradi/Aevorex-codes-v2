@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface OHLC {
   date: string;
@@ -19,7 +19,7 @@ export interface ForexHistoryResponse {
 export const useForexPairHistory = (pair: string | null, days = 30) => {
   const endpoint = pair ? `/api/v1/macro/forex/${pair.replace('/', '')}/history?days=${days}` : null;
 
-  const { data, error, isLoading, mutate } = useSWR<ForexHistoryResponse>(endpoint, get, {
+  const { data, error, isLoading, mutate } = useSWR<ForexHistoryResponse>(endpoint, (url) => swrFetcher<ForexHistoryResponse>(url), {
     revalidateOnFocus: false,
     refreshInterval: 5 * 60_000,
   });

@@ -1,33 +1,34 @@
 # Stage 1: Build stage
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies
+# Install build tooling
 RUN pip install --upgrade pip
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
+# Copy backend requirements from repo root context
+COPY modules/financehub/backend/requirements.txt ./requirements.txt
+
+# Build wheels for faster final install
 RUN pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
 
-
-# Stage 2: Final stage
+# Stage 2: Final runtime image
 FROM python:3.11-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Copy built wheels and install them
+# Install deps from wheels
 COPY --from=builder /app/wheels /wheels/
-COPY requirements.txt .
+COPY modules/financehub/backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy full modules tree so imports like `modules.financehub.backend.*` work
+COPY modules /app/modules
 
-# Expose port and run the application
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Cloud Run expects the container to listen on $PORT (default 8080)
+EXPOSE 8080
+
+CMD ["sh", "-c", "uvicorn modules.financehub.backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { get } from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
 
 export interface PolicyRateHistory {
   [date: string]: {
@@ -26,7 +26,7 @@ export interface ECBPolicyRatesResponse {
 export const useECBPolicyRates = (period: string = '1y') => {
   const { data, error, isLoading, mutate } = useSWR<ECBPolicyRatesResponse>(
     `/api/v1/macro/ecb/rates?period=${period}`,
-    get,
+    (url) => swrFetcher<ECBPolicyRatesResponse>(url),
     {
       refreshInterval: 300000, // 5 minutes
       revalidateOnFocus: false,

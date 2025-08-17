@@ -32,7 +32,7 @@ async def get_ecb_rates(
     period: Optional[str] = Query(None, description="1d,1w,1m,6m,1y…"),
 ) -> Dict[str, Any]:
     """Return O/N … 12 M tenor-grid mapped from ECB FM dataflow."""
-    return rl.get_short_end_rates(service, start_date, end_date, period)
+    return await rl.get_short_end_rates(service, start_date, end_date, period)
 
 @rates_router.get("/rates/all", include_in_schema=False)
 async def get_ecb_rates_alias(

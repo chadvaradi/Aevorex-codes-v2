@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Chevron Down Icon
@@ -20,8 +20,17 @@ export const TickerDropdown = () => {
 
   const currentTicker = getCurrentTicker();
 
-  // Mock recent tickers - in real app, this would come from localStorage or context
-  const recentTickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'META', 'NFLX'];
+  // Use persisted recent tickers instead of mock data
+  const recentTickers = useMemo(() => {
+    try {
+      const raw = localStorage.getItem('recent_tickers');
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) {
+        return parsed.filter((t) => typeof t === 'string').slice(0, 12);
+      }
+    } catch {}
+    return [] as string[];
+  }, []);
 
   if (!currentTicker) {
     return null;
@@ -71,6 +80,9 @@ export const TickerDropdown = () => {
                 {ticker}
               </a>
             ))}
+            {recentTickers.length === 0 && (
+              <div className="px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400">No recent tickers</div>
+            )}
           </div>
         </>
       )}

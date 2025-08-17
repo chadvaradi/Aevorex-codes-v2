@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import api from '@/lib/api';
+import { swrFetcher } from '@/lib/api';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 // Assuming a search result item has this structure.
 // This should be aligned with the actual API response.
@@ -9,18 +10,35 @@ export interface SearchResult {
 }
 
 export function useSearchData(query: string) {
-  const key =
-    query && query.length >= 2
-      ? `/api/v1/stock/search?q=${encodeURIComponent(query)}&limit=10`
-      : null;
+  const [debounced, setDebounced] = useState('');
+  const debounceMs = 250;
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      setDebounced(query);
+    }, debounceMs);
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
+  }, [query]);
+
+  const key = useMemo(() => {
+    const q = debounced?.trim();
+    if (!q || q.length < 2) return null;
+    return `/api/v1/stock/search?q=${encodeURIComponent(q)}&limit=10`;
+  }, [debounced]);
 
   const { data, isLoading, error } = useSWR<SearchResult[]>(
     key,
-    (url: string) => api.get<SearchResult[]>(url),
+    (url: string) => swrFetcher<SearchResult[]>(url),
     {
-      dedupingInterval: 60 * 60 * 1000, // 1 hour
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+      keepPreviousData: true as any,
     }
   );
 
-  return { data, isLoading, error };
-} 
+  return { data: data ?? [], isLoading, error };
+}

@@ -15,10 +15,15 @@ export interface MarketNewsResponse {
   metadata?: Record<string, unknown>;
 }
 
+const fetcher = async (url: string): Promise<MarketNewsResponse> => {
+  const response = await get<MarketNewsResponse>(url);
+  return response.data;
+};
+
 export const useMarketNews = () => {
   const { data, error, isLoading, mutate } = useSWR<MarketNewsResponse>(
     '/api/v1/market/news',
-    get,
+    fetcher,
     {
       refreshInterval: 5 * 60_000, // 5 minutes
       revalidateOnFocus: false,
